@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>猫娘贪吃蛇🐱（道具版）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', '幼圆', sans-serif;
+        }
+        body {
+            background: #fdf2f8;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffc1e9' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #ff69b4;
+            padding: 20px;
+        }
+        .game-container {
+            position: relative;
+            border: 4px solid #ffb6c1;
+            border-radius: 12px;
+            background: #fff0f5;
+            box-shadow: 0 0 25px rgba(255, 105, 180, 0.2);
+            max-width: 100%;
+            overflow: hidden;
+        }
+        .game-container::before, .game-container::after {
+            content: '';
+            position: absolute;
+            top: -15px;
+            width: 30px;
+            height: 40px;
+            background: #ffc1e9;
+            border-radius: 50% 50% 0 0;
+            box-shadow: inset 0 -5px 0 #ff99cc;
+        }
+        .game-container::before {
+            left: 30px;
+            transform: rotate(-30deg);
+        }
+        .game-container::after {
+            right: 30px;
+            transform: rotate(30deg);
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-width: 400px;
+            padding: 10px;
+        }
+        .game-info {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            text-shadow: 1px 1px 2px #ffcce5;
+        }
+        .score {
+            color: #ff4500;
+            font-weight: bold;
+            font-size: 1.5rem;
+            background: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 2px dashed #ffb6c1;
+        }
+        .enemy-count {
+            color: #9932cc;
+            font-weight: bold;
+            font-size: 1.2rem;
+            background: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 2px dashed #ffb6c1;
+        }
+        .buff-tip {
+            color: #228b22;
+            font-weight: bold;
+            font-size: 1.2rem;
+            background: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 2px dashed #90ee90;
+            display: none; /* 初始隐藏 */
+        }
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px 40px;
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+            z-index: 10;
+            width: 85%;
+            max-width: 320px;
+            border: 3px solid #ff69b4;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.3);
+        }
+        .game-over h2 {
+            color: #ff69b4;
+            margin-bottom: 10px;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .game-over h2::before, .game-over h2::after {
+            content: '🐾';
+        }
+        .game-over p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #ff4500;
+            font-weight: bold;
+        }
+        .restart-btn {
+            padding: 12px 40px;
+            background: linear-gradient(45deg, #ff99cc, #ff69b4);
+            border: none;
+            border-radius: 30px;
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 0 #ff4d94;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #ff4d94;
+        }
+        .restart-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #ff4d94;
+        }
+        .touch-controls {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            width: 300px;
+        }
+        .control-btn {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(45deg, #ffc1e9, #ff99cc);
+            color: #ff69b4;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 0 #ffb6c1, inset 0 -3px 0 rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ff69b4;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+        .upBtn::before {
+            bottom: 20px;
+        }
+        .downBtn::before {
+            top: 20px;
+        }
+        .leftBtn::before {
+            right: 20px;
+        }
+        .rightBtn::before {
+            left: 20px;
+        }
+        .control-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #ffb6c1;
+            background: linear-gradient(45deg, #ff99cc, #ff69b4);
+            color: #fff;
+        }
+        .empty-btn {
+            background: transparent;
+            border: none;
+            cursor: default;
+            box-shadow: none;
+        }
+        .empty-btn:active {
+            transform: none;
+        }
+        .controls-tip {
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #ff69b4;
+            text-align: center;
+            background: #fff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 2px dashed #ffb6c1;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-info">
+        <span>🐱 分数: <span class="score" id="score">0</span></span>
+        <span class="enemy-count">敌人: <span id="enemyCount">0</span></span>
+        <span class="buff-tip" id="buffTip">加速中⚡</span> <!-- 加速提示 -->
+    </div>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <div class="game-over" id="gameOver">
+            <h2>被敌人抓到啦!</h2>
+            <p>最终分数: <span id="finalScore">0</span> 🐟</p>
+            <button class="restart-btn" id="restartBtn">再来一局喵~</button>
+        </div>
+    </div>
+    <div class="touch-controls">
+        <button class="empty-btn"></button>
+        <button class="control-btn" id="upBtn">↑</button>
+        <button class="empty-btn"></button>
+        <button class="control-btn" id="leftBtn">←</button>
+        <button class="empty-btn"></button>
+        <button class="control-btn" id="rightBtn">→</button>
+        <button class="empty-btn"></button>
+        <button class="control-btn" id="downBtn">↓</button>
+        <button class="empty-btn"></button>
+    </div>
+    <div class="controls-tip">
+        点击猫爪控制蛇蛇 🐾 吃鱼干刷敌人！吃绿色猫薄荷加速⚡ 避开黑色小恶魔~
+    </div>
+
+    <script>
+        // 游戏核心变量
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const enemyCountElement = document.getElementById('enemyCount');
+        const buffTipElement = document.getElementById('buffTip');
+        const gameOverElement = document.getElementById('gameOver');
+        const finalScoreElement = document.getElementById('finalScore');
+        const restartBtn = document.getElementById('restartBtn');
+        const upBtn = document.getElementById('upBtn');
+        const downBtn = document.getElementById('downBtn');
+        const leftBtn = document.getElementById('leftBtn');
+        const rightBtn = document.getElementById('rightBtn');
+
+        // 游戏配置（核心修改）
+        const gridSize = 20;
+        const tileCount = canvas.width / gridSize;
+        const originalSnakeSpeed = 130; // 蛇原始速度
+        const boostedSnakeSpeed = 90; // 加速后速度（比原来快40ms）
+        let currentSnakeSpeed = originalSnakeSpeed; // 当前蛇速度
+        const enemySpeed = 220; // 敌人速度减慢（从180→220，更易躲避）
+
+        // 蛇的状态
+        let snake = [{ x: 10, y: 10 }];
+        let direction = { x: 1, y: 0 };
+        let nextDirection = { x: 1, y: 0 };
+        let food = { x: 5, y: 5 };
+        let score = 0;
+        let gameLoop;
+
+        // 敌人状态
+        let enemies = [];
+        let enemyMoveTimer = 0;
+
+        // 猫薄荷道具状态（新增）
+        let catnip = null; // 存储道具位置
+        let isCatnipActive = false; // 是否处于加速状态
+        let catnipTimer = 0; // 加速计时器（毫秒）
+        const catnipDuration = 5000; // 加速持续时间（5秒）
+
+        // 初始化游戏
+        function initGame() {
+            snake = [{ x: 10, y: 10 }];
+            direction = { x: 1, y: 0 };
+            nextDirection = { x: 1, y: 0 };
+            score = 0;
+            enemies = [];
+            catnip = null; // 重置道具
+            isCatnipActive = false;
+            catnipTimer = 0;
+            currentSnakeSpeed = originalSnakeSpeed; // 恢复原始速度
+            scoreElement.textContent = score;
+            enemyCountElement.textContent = enemies.length;
+            buffTipElement.style.display = 'none'; // 隐藏加速提示
+            gameOverElement.style.display = 'none';
+            generateFood();
+            generateCatnip(); // 初始生成一个猫薄荷
+            startGameLoop();
+        }
+
+        // 开始游戏循环（适配动态速度）
+        function startGameLoop() {
+            clearInterval(gameLoop);
+            gameLoop = setInterval(updateGame, currentSnakeSpeed);
+        }
+
+        // 更新游戏状态（核心修改）
+        function updateGame() {
+            direction = { ...nextDirection };
+            moveSnake();
+            
+            // 敌人移动逻辑
+            enemyMoveTimer += currentSnakeSpeed;
+            if (enemyMoveTimer >= enemySpeed) {
+                updateEnemies();
+                enemyMoveTimer = 0;
+            }
+            
+            // 加速状态计时
+            if (isCatnipActive) {
+                catnipTimer += currentSnakeSpeed;
+                if (catnipTimer >= catnipDuration) {
+                    // 加速结束，恢复原始状态
+                    isCatnipActive = false;
+                    currentSnakeSpeed = originalSnakeSpeed;
+                    buffTipElement.style.display = 'none';
+                    startGameLoop(); // 重新启动循环以更新速度
+                }
+            }
+            
+            // 碰撞检测
+            if (checkCollision() || checkEnemyCollision()) {
+                endGame();
+                return;
+            }
+            
+            // 道具碰撞检测（新增）
+            checkCatnipCollision();
+            
+            checkFoodCollision();
+            drawGame();
+        }
+
+        // 移动蛇
+        function moveSnake() {
+            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+            snake.unshift(head);
+        }
+
+        // 检测边界/自身碰撞
+        function checkCollision() {
+            const head = snake[0];
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+                return true;
+            }
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // 检测食物碰撞（修改：吃鱼干生成敌人+刷新道具）
+        function checkFoodCollision() {
+            const head = snake[0];
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                scoreElement.textContent = score;
+                generateFood();
+                generateEnemy();
+                generateCatnip(); // 刷新猫薄荷道具
+                enemyCountElement.textContent = enemies.length;
+            } else {
+                snake.pop();
+            }
+        }
+
+        // 生成鱼干（避开蛇、敌人、道具）
+        function generateFood() {
+            let newFood;
+            do {
+                newFood = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+            } while (
+                snake.some(segment => segment.x === newFood.x && segment.y === newFood.y) ||
+                enemies.some(enemy => enemy.x === newFood.x && enemy.y === newFood.y) ||
+                (catnip && catnip.x === newFood.x && catnip.y === newFood.y)
+            );
+            food = newFood;
+        }
+
+        // 生成敌人
+        function generateEnemy() {
+            let newEnemy;
+            do {
+                newEnemy = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+            } while (
+                snake.some(segment => segment.x === newEnemy.x && segment.y === newEnemy.y) ||
+                (food.x === newEnemy.x && food.y === newEnemy.y) ||
+                enemies.some(enemy => enemy.x === newEnemy.x && enemy.y === newEnemy.y) ||
+                (catnip && catnip.x === newEnemy.x && catnip.y === newEnemy.y)
+            );
+            enemies.push(newEnemy);
+        }
+
+        // 生成猫薄荷道具（新增：避开蛇、敌人、食物）
+        function generateCatnip() {
+            let newCatnip;
+            do {
+                newCatnip = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+            } while (
+                snake.some(segment => segment.x === newCatnip.x && segment.y === newCatnip.y) ||
+                enemies.some(enemy => enemy.x === newCatnip.x && enemy.y === newCatnip.y) ||
+                (food.x === newCatnip.x && food.y === newCatnip.y)
+            );
+            catnip = newCatnip;
+        }
+
+        // 敌人追踪（速度减慢）
+        function updateEnemies() {
+            const head = snake[0];
+            enemies.forEach(enemy => {
+                // x轴追踪
+                if (enemy.x < head.x) {
+                    enemy.x += 1;
+                } else if (enemy.x > head.x) {
+                    enemy.x -= 1;
+                }
+                // y轴追踪
+                if (enemy.y < head.y) {
+                    enemy.y += 1;
+                } else if (enemy.y > head.y) {
+                    enemy.y -= 1;
+                }
+            });
+        }
+
+        // 检测敌人碰撞
+        function checkEnemyCollision() {
+            const head = snake[0];
+            return enemies.some(enemy => enemy.x === head.x && enemy.y === head.y);
+        }
+
+        // 检测猫薄荷碰撞（新增）
+        function checkCatnipCollision() {
+            if (!catnip) return;
+            const head = snake[0];
+            if (head.x === catnip.x && head.y === catnip.y) {
+                // 激活加速效果
+                isCatnipActive = true;
+                catnipTimer = 0;
+                currentSnakeSpeed = boostedSnakeSpeed;
+                buffTipElement.style.display = 'inline-block'; // 显示加速提示
+                catnip = null; // 道具消失
+                startGameLoop(); // 重新启动循环以更新速度
+            }
+        }
+
+        // 绘制游戏画面（新增道具绘制）
+        function drawGame() {
+            // 清空画布
+            ctx.fillStyle = '#fff0f5';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制蛇身体（加速时变深粉色）
+            const snakeBodyColor = isCatnipActive ? '#ff69b4' : '#ffc1e9';
+            const snakeDotColor = isCatnipActive ? '#ff4d94' : '#ff99cc';
+            snake.forEach((segment, index) => {
+                if (index === 0) return;
+                ctx.fillStyle = snakeBodyColor;
+                ctx.beginPath();
+                ctx.arc(
+                    segment.x * gridSize + gridSize/2,
+                    segment.y * gridSize + gridSize/2,
+                    gridSize/2 - 1,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+                ctx.fillStyle = snakeDotColor;
+                ctx.beginPath();
+                ctx.arc(
+                    segment.x * gridSize + gridSize/2,
+                    segment.y * gridSize + gridSize/2,
+                    gridSize/4,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+            });
+
+            // 绘制蛇头（加速时变深）
+            const snakeHeadColor = isCatnipActive ? '#ff4d94' : '#ff99cc';
+            const snakeEarColor = isCatnipActive ? '#ff3385' : '#ff69b4';
+            const head = snake[0];
+            ctx.fillStyle = snakeHeadColor;
+            ctx.beginPath();
+            ctx.arc(
+                head.x * gridSize + gridSize/2,
+                head.y * gridSize + gridSize/2,
+                gridSize/2 - 1,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+            // 猫耳
+            ctx.fillStyle = snakeEarColor;
+            ctx.beginPath();
+            ctx.moveTo(head.x * gridSize + gridSize/4, head.y * gridSize - 5);
+            ctx.lineTo(head.x * gridSize - 3, head.y * gridSize + gridSize/4);
+            ctx.lineTo(head.x * gridSize + gridSize/2, head.y * gridSize + 3);
+            ctx.closePath();
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(head.x * gridSize + 3*gridSize/4, head.y * gridSize - 5);
+            ctx.lineTo(head.x * gridSize + gridSize + 3, head.y * gridSize + gridSize/4);
+            ctx.lineTo(head.x * gridSize + gridSize/2, head.y * gridSize + 3);
+            ctx.closePath();
+            ctx.fill();
+            // 蛇眼
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(
+                head.x * gridSize + gridSize/3,
+                head.y * gridSize + gridSize/3,
+                3,
+                0,
+                Math.PI * 2
+            );
+            ctx.arc(
+                head.x * gridSize + 2*gridSize/3,
+                head.y * gridSize + gridSize/3,
+                3,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(
+                head.x * gridSize + gridSize/3,
+                head.y * gridSize + gridSize/3,
+                1.5,
+                0,
+                Math.PI * 2
+            );
+            ctx.arc(
+                head.x * gridSize + 2*gridSize/3,
+                head.y * gridSize + gridSize/3,
+                1.5,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+
+            // 绘制鱼干食物
+            ctx.fillStyle = '#ff4500';
+            const foodX = food.x * gridSize;
+            const foodY = food.y * gridSize;
+            ctx.beginPath();
+            ctx.ellipse(
+                foodX + gridSize/2,
+                foodY + gridSize/2,
+                gridSize/2 - 2,
+                gridSize/3,
+                0,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(foodX + gridSize - 5, foodY + gridSize/2);
+            ctx.lineTo(foodX + gridSize + 3, foodY + gridSize/4);
+            ctx.lineTo(foodX + gridSize + 3, foodY + 3*gridSize/4);
+            ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(
+                foodX + gridSize/4,
+                foodY + gridSize/2,
+                2,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+
+            // 绘制敌人（速度减慢，外观不变）
+            ctx.fillStyle = '#333';
+            enemies.forEach(enemy => {
+                const enemyX = enemy.x * gridSize;
+                const enemyY = enemy.y * gridSize;
+                ctx.beginPath();
+                ctx.arc(
+                    enemyX + gridSize/2,
+                    enemyY + gridSize/2,
+                    gridSize/2 - 2,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+                // 恶魔角
+                ctx.fillStyle = '#666';
+                ctx.beginPath();
+                ctx.moveTo(enemyX + gridSize/4, enemyY - 3);
+                ctx.lineTo(enemyX - 2, enemyY + gridSize/4);
+                ctx.lineTo(enemyX + gridSize/3, enemyY + gridSize/5);
+                ctx.closePath();
+                ctx.fill();
+                ctx.beginPath();
+                ctx.moveTo(enemyX + 3*gridSize/4, enemyY - 3);
+                ctx.lineTo(enemyX + gridSize + 2, enemyY + gridSize/4);
+                ctx.lineTo(enemyX + 2*gridSize/3, enemyY + gridSize/5);
+                ctx.closePath();
+                ctx.fill();
+                // 敌人眼睛
+                ctx.fillStyle = '#ff0000';
+                ctx.beginPath();
+                ctx.arc(
+                    enemyX + gridSize/3,
+                    enemyY + gridSize/3,
+                    2.5,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.arc(
+                    enemyX + 2*gridSize/3,
+                    enemyY + gridSize/3,
+                    2.5,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(
+                    enemyX + gridSize/3,
+                    enemyY + gridSize/3,
+                    1,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.arc(
+                    enemyX + 2*gridSize/3,
+                    enemyY + gridSize/3,
+                    1,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+            });
+
+            // 绘制猫薄荷道具（新增：绿色叶子形状）
+            if (catnip) {
+                const catnipX = catnip.x * gridSize;
+                const catnipY = catnip.y * gridSize;
+                ctx.fillStyle = '#228b22';
+                // 叶子主体
+                ctx.beginPath();
+                ctx.ellipse(
+                    catnipX + gridSize/2,
+                    catnipY + gridSize/2,
+                    gridSize/2 - 3,
+                    gridSize/3 + 2,
+                    Math.PI / 4,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+                // 叶子纹理
+                ctx.fillStyle = '#1e7d1e';
+                ctx.beginPath();
+                ctx.moveTo(catnipX + gridSize/2, catnipY + gridSize/2);
+                ctx.lineTo(catnipX + gridSize/2 + 10, catnipY + gridSize/2 - 10);
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(catnipX + gridSize/2, catnipY + gridSize/2);
+                ctx.lineTo(catnipX + gridSize/2 - 8, catnipY + gridSize/2 + 8);
+                ctx.stroke();
+                ctx.lineWidth = 1;
+            }
+        }
+
+        // 结束游戏
+        function endGame() {
+            clearInterval(gameLoop);
+            finalScoreElement.textContent = score;
+            gameOverElement.style.display = 'block';
+        }
+
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowUp':
+                    if (direction.y !== 1) nextDirection = { x: 0, y: -1 };
+                    break;
+                case 'ArrowDown':
+                    if (direction.y !== -1) nextDirection = { x: 0, y: 1 };
+                    break;
+                case 'ArrowLeft':
+                    if (direction.x !== 1) nextDirection = { x: -1, y: 0 };
+                    break;
+                case 'ArrowRight':
+                    if (direction.x !== -1) nextDirection = { x: 1, y: 0 };
+                    break;
+            }
+        });
+
+        // 触屏按钮控制
+        upBtn.addEventListener('click', () => {
+            if (direction.y !== 1) nextDirection = { x: 0, y: -1 };
+        });
+        downBtn.addEventListener('click', () => {
+            if (direction.y !== -1) nextDirection = { x: 0, y: 1 };
+        });
+        leftBtn.addEventListener('click', () => {
+            if (direction.x !== 1) nextDirection = { x: -1, y: 0 };
+        });
+        rightBtn.addEventListener('click', () => {
+            if (direction.x !== -1) nextDirection = { x: 1, y: 0 };
+        });
+
+        // 重新开始按钮
+        restartBtn.addEventListener('click', initGame);
+
+        // 初始化游戏
+        initGame();
+    </script>
+</body>
+</html>
