@@ -110,6 +110,13 @@
             margin-bottom: 15px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             border-left: 4px solid #9370DB;
+            animation: fadeIn 0.5s ease; /* 新留言淡入动画 */
+        }
+
+        /* 新留言淡入动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .card-header {
@@ -159,6 +166,27 @@
             font-size: 16px;
         }
 
+        /* 新留言提示条 */
+        .new-message-tip {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #9370DB, #8A2BE2);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            box-shadow: 0 3px 10px rgba(147, 112, 219, 0.3);
+            z-index: 8;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .new-message-tip.show {
+            opacity: 1;
+        }
+
         /* 底部双按钮（匹配你提供的图片风格） */
         .bottom-btn-container {
             position: fixed;
@@ -203,6 +231,9 @@
         <h1 class="title">✨ 留言评论 ✨</h1>
     </div>
 
+    <!-- 新留言提示条（默认隐藏） -->
+    <div class="new-message-tip" id="newMessageTip">有新的留言啦～</div>
+
     <!-- 留言输入区 -->
     <div class="input-area">
         <input type="text" class="username-input" placeholder="请输入你的昵称">
@@ -243,12 +274,18 @@
         const messageList = document.querySelector('.message-list');
         const loadingTip = document.querySelector('#loadingTip');
         const emptyTip = document.querySelector('#emptyTip');
+        const newMessageTip = document.querySelector('#newMessageTip');
 
-        // 初始化：加载留言
+        // 存储当前留言数量（用于判断是否有新留言）
+        let currentMessageCount = 0;
+
+        // 初始化：加载留言+启动自动刷新
         async function init() {
             try {
                 const messages = await fetchMessages();
+                currentMessageCount = messages.length; // 记录初始留言数
                 renderMessages(messages);
+                startAutoRefresh(); // 启动自动刷新
             } catch (err) {
                 alert('加载留言失败：' + err.message);
                 loadingTip.textContent = '加载失败，刷新试试~';
@@ -258,10 +295,11 @@
         // 从LeanCloud读取留言
         async function fetchMessages() {
             const query = new AV.Query(Message);
-            query.descending('createdAt'); // 按时间倒序
+            query.descending('createdAt'); // 按时间倒序（最新的在前面）
             const messageObjects = await query.find();
             // 转换为普通对象便于渲染
             return messageObjects.map(msg => ({
+                id: msg.id, // 用LeanCloud的唯一ID标识留言，避免重复
                 username: msg.get('username'),
                 content: msg.get('content'),
                 time: msg.createdAt.toLocaleString()
@@ -282,7 +320,7 @@
         function renderMessages(messages) {
             loadingTip.style.display = 'none';
 
-            // 清空现有留言卡片
+            // 清空现有留言卡片（除了标题、加载提示、空提示）
             const cards = messageList.querySelectorAll('.message-card');
             cards.forEach(card => card.remove());
 
@@ -297,6 +335,7 @@
             messages.forEach(message => {
                 const card = document.createElement('div');
                 card.className = 'message-card';
+                card.dataset.id = message.id; // 存储留言ID
                 card.innerHTML = `
                     <div class="card-header">
                         <span class="username">${escapeHtml(message.username)}</span>
@@ -306,6 +345,44 @@
                 `;
                 messageList.insertBefore(card, emptyTip);
             });
+        }
+
+        // 自动刷新最新留言（30秒一次）
+        function startAutoRefresh() {
+            setInterval(async () => {
+                try {
+                    const latestMessages = await fetchMessages();
+                    const newCount = latestMessages.length;
+
+                    // 判断是否有新留言（新数量 > 当前数量）
+                    if (newCount > currentMessageCount) {
+                        const newMessages = latestMessages.slice(0, newCount - currentMessageCount); // 只取新增的留言
+                        currentMessageCount = newCount; // 更新当前留言数
+
+                        // 显示新留言提示（3秒后自动隐藏）
+                        newMessageTip.classList.add('show');
+                        setTimeout(() => newMessageTip.classList.remove('show'), 3000);
+
+                        // 把新留言插入到列表最前面（带动画）
+                        newMessages.forEach(msg => {
+                            const card = document.createElement('div');
+                            card.className = 'message-card';
+                            card.dataset.id = msg.id;
+                            card.innerHTML = `
+                                <div class="card-header">
+                                    <span class="username">${escapeHtml(msg.username)}</span>
+                                    <span class="time">${msg.time}</span>
+                                </div>
+                                <div class="content">${escapeHtml(msg.content)}</div>
+                            `;
+                            // 插入到列表顶部（最新留言在最前面）
+                            messageList.insertBefore(card, messageList.querySelector('.list-title').nextSibling);
+                        });
+                    }
+                } catch (err) {
+                    console.log('自动刷新失败：', err); // 不弹窗打扰用户，只在控制台打印
+                }
+            }, 30000); // 30秒刷新一次（可修改数字调整间隔，单位：毫秒）
         }
 
         // 防止XSS攻击
@@ -346,6 +423,7 @@
                 };
                 // 提交到LeanCloud并重新渲染
                 const updatedMessages = await submitMessageToCloud(newMessage);
+                currentMessageCount = updatedMessages.length; // 更新留言数
                 renderMessages(updatedMessages);
                 // 清空输入框
                 usernameInput.value = '';
