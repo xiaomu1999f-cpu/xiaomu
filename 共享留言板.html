@@ -252,18 +252,18 @@
         <!-- 留言卡片会通过JS动态添加 -->
     </div>
 
-    <!-- 底部双按钮：首页+留言板 -->
+    <!-- 底部双按钮：首页+留言板（这里是正常显示的） -->
     <div class="bottom-btn-container">
         <button class="bottom-btn home-btn" onclick="window.location.href='https://xiaomu1999f-cpu.github.io/xiaomu/index.html'">首页</button>
         <button class="bottom-btn message-board-btn">留言板</button>
     </div>
 
     <script>
-        // 初始化LeanCloud（已用你提供的凭证）
+        // 修正：LeanCloud初始化参数名（是serverURLs，不是serverURL）
         AV.init({
             appId: "axRSxsxwONJG6tu4LTjwtztSA-MdYXbMMI",
             appKey: "ezPH28np7U6A2ZqYTrrfywrc",
-            serverURL: "https://axrsxsxw.api.lncldglobal.com"
+            serverURLs: "https://axrsxsxw.api.lncldglobal.com"
         });
         const Message = AV.Object.extend('Message');
 
