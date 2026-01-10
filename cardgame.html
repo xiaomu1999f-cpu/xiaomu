@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>软萌少女想请教你 - 1.0.2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #fff;
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* 顶部游戏信息区 */
+        .top-header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .game-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .game-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .tag-group {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .tag-blue {
+            background-color: #87CEFA;
+        }
+
+        .tag-pink {
+            background-color: #FFB6C1;
+        }
+
+        /* 详情标签栏 */
+        .tab-nav {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0 20px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .tab.active {
+            font-weight: bold;
+            border-bottom: 2px solid #333;
+            padding-bottom: 3px;
+        }
+
+        /* 游戏预览图区域 */
+        .preview-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .preview-img {
+            flex: 1;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        /* 游戏简介区域 */
+        .intro-area {
+            margin-bottom: 30px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .intro-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .intro-content {
+            font-size: 14px;
+        }
+
+        /* 立即下载按钮 */
+        .download-btn {
+            display: block;
+            width: 80%;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            background-color: #1E90FF;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 0 auto 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部游戏信息 -->
+    <div class="top-header">
+        <img src="game-icon.png" alt="游戏图标" class="game-avatar">
+        <h1 class="game-title">软萌少女想请教你 - 1.0.2</h1>
+        <div class="tag-group">
+            <span class="tag tag-blue">384.86</span>
+            <span class="tag tag-pink">绅士游戏</span>
+        </div>
+    </div>
+
+    <!-- 仅保留详情标签 -->
+    <div class="tab-nav">
+        <span class="tab active">详情</span>
+    </div>
+
+    <!-- 游戏预览图 -->
+    <div class="preview-area">
+        <img src="game-preview1.png" alt="游戏预览" class="preview-img">
+        <img src="game-preview2.png" alt="游戏预览" class="preview-img">
+    </div>
+
+    <!-- 游戏简介 -->
+    <div class="intro-area">
+        <h2 class="intro-title">游戏简介：</h2>
+        <p class="intro-content">「与温柔少女的周末家教生活」！<br>
+            身为家庭教师的你，一直以来教导的都是年幼的学生，却突然被指派负责一名应考生。<br>
+            必须在限期内让她具备通过考试的学习能力，然而……？<br>
+            突然开始的与家教学申花音（Kanon）酱的周末授课生活<br>
+            花音酱似乎对性有着异常浓厚的兴趣，面对她若无其事的性骚扰，你竟也并非完全无动于衷<br>
+            作为家庭教师，就好好满足花音酱的各种需求吧！当然，别忘</p>
+    </div>
+
+    <!-- 下载按钮 -->
+    <a href="https://pan.quark.cn/s/5d3b929380cf" target="_blank" class="download-btn">立即下载</a>
+</body>
+</html>
