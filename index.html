@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>W站</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "思源黑体", sans-serif;
+        }
+
+        /* 让页面占满手机竖屏高度 */
+        html, body {
+            height: 100%;
+            overflow: hidden; /* 禁止滚动，避免边框偏移 */
+        }
+
+        body {
+            background-color: #f8f8f8;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0 0 50px 0; /* 底部留首页高度，不贴边 */
+            border: 4px solid #9370DB; /* 竖屏外框厚度，更有质感 */
+            border-radius: 16px; /* 手机边框圆角，更逼真 */
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(147, 112, 219, 0.3); /* 增强立体外框感 */
+            position: relative; /* 让底部首页绝对定位 */
+        }
+
+        /* 顶部：美化W站文字 */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #fff;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .site-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-right: 15px;
+        }
+
+        .search-box {
+            flex: 1;
+            height: 40px;
+            padding: 0 15px;
+            border: 1px solid #eee;
+            border-radius: 20px;
+            font-size: 15px;
+            color: #999;
+        }
+
+        /* 分类标签栏 */
+        .category-tabs {
+            padding: 12px 20px;
+            background-color: #fff;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .tab {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #409EFF;
+            color: #fff;
+            border-radius: 25px;
+            font-size: 15px;
+        }
+
+        /* 游戏列表：自适应高度，不溢出 */
+        .game-list {
+            padding: 20px;
+            height: calc(100% - 170px); /* 计算剩余高度，避免溢出 */
+            overflow-y: auto; /* 内容超出时可滚动 */
+        }
+
+        .game-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        /* 游戏链接：去除下划线，保证点击区域覆盖头像+名称 */
+        .game-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            width: 100%;
+        }
+
+        /* 游戏头像：紫色边框呼应外框 */
+        .game-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            margin-right: 15px;
+            border: 2px solid #9370DB;
+            object-fit: cover;
+        }
+
+        .game-info {
+            flex: 1;
+        }
+
+        .game-name {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .game-meta {
+            font-size: 15px;
+            color: #666;
+        }
+
+        /* 底部“首页”：固定在边框内底部 */
+        .bottom-home {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            padding: 12px 0;
+            text-align: center;
+            border-top: 1px solid #f5f5f5;
+        }
+
+        .home-text {
+            font-size: 16px;
+            color: rgba(64, 144, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部：美化W站 + 搜索框 -->
+    <div class="top-bar">
+        <div class="site-title">W站</div>
+        <input type="text" class="search-box" placeholder="搜索内容">
+    </div>
+
+    <!-- 分类标签 -->
+    <div class="category-tabs">
+        <div class="tab">绅士游戏</div>
+    </div>
+
+    <!-- 游戏列表：点击跳转，适配竖屏高度 -->
+    <div class="game-list">
+        <div class="game-item">
+            <a href="https://xiaomu1999f-cpu.github.io/xiaomu/cardgame.html" class="game-link">
+                <img src="game-icon.png" alt="游戏头像" class="game-avatar">
+                <div class="game-info">
+                    <div class="game-name">软萌少女想请教你</div>
+                    <div class="game-meta">384.86M · 绅士游戏</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 底部“首页”：完全在边框内 -->
+    <div class="bottom-home">
+        <span class="home-text">首页</span>
+    </div>
+</body>
+</html>
