@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>留言评论</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "思源黑体", sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            background-color: #f5f7ff;
+            overflow-x: hidden;
+            padding-bottom: 70px; /* 给底部按钮留空间 */
+        }
+
+        /* 顶部标题栏 */
+        .top-bar {
+            background: linear-gradient(135deg, #9370DB, #8A2BE2);
+            padding: 18px 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(147, 112, 219, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .title {
+            font-size: 22px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* 留言输入区（适配触控） */
+        .input-area {
+            padding: 20px;
+            background-color: #fff;
+            margin: 15px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+        }
+
+        .username-input {
+            width: 100%;
+            height: 45px;
+            padding: 0 15px;
+            border: 2px solid #E6E6FA;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .message-input {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 2px solid #E6E6FA;
+            border-radius: 8px;
+            resize: none;
+            font-size: 16px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .submit-btn {
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(135deg, #9370DB, #8A2BE2);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(147, 112, 219, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* 留言列表区 */
+        .message-list {
+            padding: 0 20px 80px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .list-title {
+            font-size: 18px;
+            color: #666;
+            margin: 15px 0;
+            padding-left: 5px;
+            border-left: 3px solid #9370DB;
+        }
+
+        /* 留言卡片 */
+        .message-card {
+            background-color: #fff;
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid #9370DB;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .username {
+            font-size: 17px;
+            font-weight: bold;
+            color: #8A2BE2;
+        }
+
+        .time {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .content {
+            font-size: 16px;
+            color: #333;
+            line-height: 1.6;
+            white-space: pre-wrap; /* 保留换行 */
+        }
+
+        /* 空列表提示 */
+        .empty-tip {
+            text-align: center;
+            padding: 50px 0;
+            color: #999;
+            font-size: 16px;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #E6E6FA;
+        }
+
+        /* 加载提示 */
+        .loading-tip {
+            text-align: center;
+            padding: 30px 0;
+            color: #999;
+            font-size: 16px;
+        }
+
+        /* 底部双按钮（匹配你提供的图片风格） */
+        .bottom-btn-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px 20px;
+            background-color: #fff;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 9;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .bottom-btn {
+            width: 48%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        /* 首页按钮（和你图片里的样式一致） */
+        .home-btn {
+            background: transparent;
+            color: #8A2BE2; /* 匹配页面紫色风格 */
+        }
+        /* 留言板按钮（当前页标识态） */
+        .message-board-btn {
+            background: linear-gradient(135deg, #9370DB, #8A2BE2);
+            color: #fff;
+            pointer-events: none; /* 禁止点击 */
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部标题栏 -->
+    <div class="top-bar">
+        <h1 class="title">✨ 留言评论 ✨</h1>
+    </div>
+
+    <!-- 留言输入区 -->
+    <div class="input-area">
+        <input type="text" class="username-input" placeholder="请输入你的昵称">
+        <textarea class="message-input" placeholder="想说的话（支持换行哦~）"></textarea>
+        <button class="submit-btn">发送留言</button>
+    </div>
+
+    <!-- 留言列表区 -->
+    <div class="message-list">
+        <h2 class="list-title">最新留言</h2>
+        <div class="loading-tip" id="loadingTip">加载中... 请稍候</div>
+        <div class="empty-tip" id="emptyTip" style="display: none;">
+            <div class="empty-icon">💬</div>
+            <p>还没有留言，快来抢占沙发~</p>
+        </div>
+        <!-- 留言卡片会通过JS动态添加 -->
+    </div>
+
+    <!-- 底部双按钮：首页+留言板 -->
+    <div class="bottom-btn-container">
+        <button class="bottom-btn home-btn" onclick="window.location.href='https://xiaomu1999f-cpu.github.io/xiaomu/index.html'">首页</button>
+        <button class="bottom-btn message-board-btn">留言板</button>
+    </div>
+
+    <script>
+        // #################### 你的信息已保留 ####################
+        const GIST_ID = "7ea0532a9d2eb76a1a940c0256821bac"; 
+        const GITHUB_TOKEN = "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"; 
+        // ################################################################
+
+        // DOM元素
+        const usernameInput = document.querySelector('.username-input');
+        const messageInput = document.querySelector('.message-input');
+        const submitBtn = document.querySelector('.submit-btn');
+        const messageList = document.querySelector('.message-list');
+        const loadingTip = document.querySelector('#loadingTip');
+        const emptyTip = document.querySelector('#emptyTip');
+
+        // 初始化：加载留言
+        async function init() {
+            try {
+                const messages = await fetchMessages();
+                renderMessages(messages);
+            } catch (err) {
+                alert('加载留言失败：' + err.message);
+                loadingTip.textContent = '加载失败，刷新试试~';
+            }
+        }
+
+        // 从Gist读取留言
+        async function fetchMessages() {
+            const url = `https://api.github.com/gists/${GIST_ID}`;
+            const response = await fetch(url);
+            
+            if (!response.ok) throw new Error('Gist不存在或访问失败');
+            
+            const data = await response.json();
+            const messageContent = data.files['messages.json'].content;
+            return messageContent ? JSON.parse(messageContent) : [];
+        }
+
+        // 提交留言到Gist
+        async function submitMessageToGist(newMessage) {
+            // 先读取现有留言
+            const messages = await fetchMessages();
+            // 新增留言放在最前面
+            messages.unshift(newMessage);
+            // 更新Gist
+            const url = `https://api.github.com/gists/${GIST_ID}`;
+            const response = await fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    files: {
+                        'messages.json': {
+                            content: JSON.stringify(messages, null, 2)
+                        }
+                    }
+                })
+            });
+
+            if (!response.ok) throw new Error('提交留言失败');
+            return messages;
+        }
+
+        // 渲染留言列表
+        function renderMessages(messages) {
+            loadingTip.style.display = 'none';
+
+            // 清空现有留言卡片
+            const cards = messageList.querySelectorAll('.message-card');
+            cards.forEach(card => card.remove());
+
+            // 显示空提示
+            if (messages.length === 0) {
+                emptyTip.style.display = 'block';
+                return;
+            }
+            emptyTip.style.display = 'none';
+
+            // 渲染每个留言
+            messages.forEach(message => {
+                const card = document.createElement('div');
+                card.className = 'message-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="username">${escapeHtml(message.username)}</span>
+                        <span class="time">${message.time}</span>
+                    </div>
+                    <div class="content">${escapeHtml(message.content)}</div>
+                `;
+                messageList.insertBefore(card, emptyTip);
+            });
+        }
+
+        // 防止XSS攻击
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // 提交留言
+        async function handleSubmit() {
+            const username = usernameInput.value.trim();
+            const content = messageInput.value.trim();
+
+            // 输入验证
+            if (!username) {
+                alert('请输入你的昵称呀~');
+                return;
+            }
+            if (!content) {
+                alert('想说的话不能为空哦~');
+                return;
+            }
+
+            // 禁用按钮防止重复提交
+            submitBtn.disabled = true;
+            submitBtn.textContent = '发送中...';
+
+            try {
+                // 构造留言对象
+                const newMessage = {
+                    username,
+                    content,
+                    time: new Date().toLocaleString() // 本地时间
+                };
+                // 提交到Gist并重新渲染
+                const updatedMessages = await submitMessageToGist(newMessage);
+                renderMessages(updatedMessages);
+                // 清空输入框
+                usernameInput.value = '';
+                messageInput.value = '';
+                alert('留言发送成功！');
+            } catch (err) {
+                alert('发送失败：' + err.message);
+            } finally {
+                // 恢复按钮
+                submitBtn.disabled = false;
+                submitBtn.textContent = '发送留言';
+            }
+        }
+
+        // 绑定事件
+        submitBtn.addEventListener('click', handleSubmit);
+        // 回车提交（Shift+Enter换行）
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit();
+            }
+        });
+
+        // 初始化页面
+        init();
+    </script>
+</body>
+</html>
