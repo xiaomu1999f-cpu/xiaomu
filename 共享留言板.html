@@ -194,6 +194,8 @@
             pointer-events: none; /* 禁止点击 */
         }
     </style>
+    <!-- 引入LeanCloud SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/leancloud-storage@4.15.0/dist/av-min.js"></script>
 </head>
 <body>
     <!-- 顶部标题栏 -->
@@ -226,10 +228,13 @@
     </div>
 
     <script>
-        // #################### 你的信息已保留 ####################
-        const GIST_ID = "7ea0532a9d2eb76a1a940c0256821bac"; 
-        const GITHUB_TOKEN = "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"; 
-        // ################################################################
+        // 初始化LeanCloud（已用你提供的凭证）
+        AV.init({
+            appId: "axRSxsxwONJG6tu4LTjwtztSA-MdYXbMMI",
+            appKey: "ezPH28np7U6A2ZqYTrrfywrc",
+            serverURL: "https://axrsxsxw.api.lncldglobal.com"
+        });
+        const Message = AV.Object.extend('Message');
 
         // DOM元素
         const usernameInput = document.querySelector('.username-input');
@@ -250,43 +255,27 @@
             }
         }
 
-        // 从Gist读取留言
+        // 从LeanCloud读取留言
         async function fetchMessages() {
-            const url = `https://api.github.com/gists/${GIST_ID}`;
-            const response = await fetch(url);
-            
-            if (!response.ok) throw new Error('Gist不存在或访问失败');
-            
-            const data = await response.json();
-            const messageContent = data.files['messages.json'].content;
-            return messageContent ? JSON.parse(messageContent) : [];
+            const query = new AV.Query(Message);
+            query.descending('createdAt'); // 按时间倒序
+            const messageObjects = await query.find();
+            // 转换为普通对象便于渲染
+            return messageObjects.map(msg => ({
+                username: msg.get('username'),
+                content: msg.get('content'),
+                time: msg.createdAt.toLocaleString()
+            }));
         }
 
-        // 提交留言到Gist
-        async function submitMessageToGist(newMessage) {
-            // 先读取现有留言
-            const messages = await fetchMessages();
-            // 新增留言放在最前面
-            messages.unshift(newMessage);
-            // 更新Gist
-            const url = `https://api.github.com/gists/${GIST_ID}`;
-            const response = await fetch(url, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `token ${GITHUB_TOKEN}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    files: {
-                        'messages.json': {
-                            content: JSON.stringify(messages, null, 2)
-                        }
-                    }
-                })
-            });
-
-            if (!response.ok) throw new Error('提交留言失败');
-            return messages;
+        // 提交留言到LeanCloud
+        async function submitMessageToCloud(newMessage) {
+            const message = new Message();
+            message.set('username', newMessage.username);
+            message.set('content', newMessage.content);
+            await message.save();
+            // 保存后返回最新留言列表
+            return fetchMessages();
         }
 
         // 渲染留言列表
@@ -353,10 +342,10 @@
                 const newMessage = {
                     username,
                     content,
-                    time: new Date().toLocaleString() // 本地时间
+                    time: new Date().toLocaleString()
                 };
-                // 提交到Gist并重新渲染
-                const updatedMessages = await submitMessageToGist(newMessage);
+                // 提交到LeanCloud并重新渲染
+                const updatedMessages = await submitMessageToCloud(newMessage);
                 renderMessages(updatedMessages);
                 // 清空输入框
                 usernameInput.value = '';
