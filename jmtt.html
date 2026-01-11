@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JMComic2_1.8.2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #fff;
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* 顶部软件信息区 */
+        .top-header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .game-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .game-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .tag-group {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .tag-blue {
+            background-color: #87CEFA;
+        }
+
+        .tag-pink {
+            background-color: #FFB6C1;
+        }
+
+        /* 详情标签栏 */
+        .tab-nav {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0 20px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .tab.active {
+            font-weight: bold;
+            border-bottom: 2px solid #333;
+            padding-bottom: 3px;
+        }
+
+        /* 软件预览图区域 */
+        .preview-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .preview-img {
+            flex: 1;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        /* 软件简介区域 */
+        .intro-area {
+            margin-bottom: 30px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .intro-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .intro-content {
+            font-size: 14px;
+        }
+
+        /* 立即下载按钮 */
+        .download-btn {
+            display: block;
+            width: 80%;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            background-color: #1E90FF;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 0 auto 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部软件信息 -->
+    <div class="top-header">
+        <img src="ic_launcher.png" alt="软件图标" class="game-avatar">
+        <h1 class="game-title">JMComic2_1.8.2</h1>
+        <div class="tag-group">
+            <span class="tag tag-blue">36.67</span>
+            <span class="tag tag-pink">绅士软件</span> <!-- 已修改 -->
+        </div>
+    </div>
+
+    <!-- 仅保留详情标签 -->
+    <div class="tab-nav">
+        <span class="tab active">详情</span>
+    </div>
+
+    <!-- 软件预览图 -->
+    <div class="preview-area">
+        <img src="game-preview1.png" alt="软件预览" class="preview-img">
+        <img src="game-preview2.png" alt="软件预览" class="preview-img">
+    </div>
+
+    <!-- 软件简介 -->
+    <div class="intro-area">
+        <h2 class="intro-title">软件简介：</h2>
+        <p class="intro-content">开🦌～</p>
+    </div>
+
+    <!-- 立即下载按钮 -->
+    <a href="https://pan.quark.cn/s/7ea6d6d4bd9c" target="_blank" class="download-btn">立即下载</a>
+</body>
+</html>
