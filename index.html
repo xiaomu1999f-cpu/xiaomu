@@ -81,10 +81,11 @@
             cursor: pointer;
         }
 
-        /* 顶部栏 */
+        /* 顶部栏 - 合并标题和按钮组 */
         .top-bar {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             padding: 15px 20px;
             background-color: #fff;
             border-bottom: 1px solid #f5f5f5;
@@ -94,28 +95,27 @@
             font-size: 24px;
             font-weight: 700;
             color: #333;
-            margin-right: 15px;
         }
 
-        .search-box {
-            flex: 1;
-            height: 40px;
-            padding: 0 15px;
-            border: 1px solid #eee;
-            border-radius: 20px;
-            font-size: 15px;
-            color: #999;
+        /* 顶部按钮组（包含今日壁纸+软件库） */
+        .top-btns {
+            display: flex;
+            gap: 10px;
         }
 
-        /* 分类标签 */
-        .category-tabs {
-            padding: 12px 20px;
+        /* 今日壁纸按钮（蓝字白背景） */
+        .top-btn {
+            padding: 8px 16px;
             background-color: #fff;
-            border-bottom: 1px solid #f5f5f5;
+            color: #409EFF;
+            border: 1px solid #409EFF;
+            border-radius: 25px;
+            font-size: 15px;
+            cursor: pointer;
         }
 
+        /* 软件库按钮（原样式） */
         .tab {
-            display: inline-block;
             padding: 8px 16px;
             background-color: #409EFF;
             color: #fff;
@@ -126,7 +126,7 @@
         /* 游戏列表 */
         .game-list {
             padding: 20px;
-            height: calc(100% - 180px);
+            height: calc(100% - 130px);
             overflow-y: auto;
         }
 
@@ -215,15 +215,13 @@
         </div>
     </div>
 
-    <!-- 顶部栏 -->
+    <!-- 顶部栏 - 添加今日壁纸按钮（位于软件库左侧） -->
     <div class="top-bar">
         <div class="site-title">W站</div>
-        <input type="text" class="search-box" placeholder="搜索内容">
-    </div>
-
-    <!-- 分类标签 -->
-    <div class="category-tabs">
-        <div class="tab">绅士游戏</div>
+        <div class="top-btns">
+            <button class="top-btn" onclick="window.location.href='https://xiaomu1999f-cpu.github.io/xiaomu/pizi.html'">今日壁纸</button>
+            <div class="tab">软件库</div>
+        </div>
     </div>
 
     <!-- 游戏列表 -->
@@ -253,6 +251,26 @@
                 <div class="game-info">
                     <div class="game-name">快鸭_1.0.19</div>
                     <div class="game-meta">21.41M · 工具软件</div>
+                </div>
+            </a>
+        </div>
+        <!-- 新增魔物娘1.2_1条目 -->
+        <div class="game-item">
+            <a href="https://xiaomu1999f-cpu.github.io/xiaomu/mowu.html" class="game-link">
+                <img src="app_icon.png" alt="魔物娘图标" class="game-avatar">
+                <div class="game-info">
+                    <div class="game-name">魔物娘1.2_1</div>
+                    <div class="game-meta">375.07M · 绅士游戏</div>
+                </div>
+            </a>
+        </div>
+        <!-- 新增JMComic2_1.8.2条目 -->
+        <div class="game-item">
+            <a href="https://xiaomu1999f-cpu.github.io/xiaomu/jmtt.html" class="game-link">
+                <img src="ic_launcher.png" alt="JMComic2图标" class="game-avatar">
+                <div class="game-info">
+                    <div class="game-name">JMComic2_1.8.2</div>
+                    <div class="game-meta">36.67M · 绅士软件</div>
                 </div>
             </a>
         </div>
