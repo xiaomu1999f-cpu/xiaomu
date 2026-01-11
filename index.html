@@ -29,6 +29,58 @@
             position: relative;
         }
 
+        /* 公告弹窗遮罩 */
+        .popup-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 公告弹窗容器 */
+        .popup-container {
+            width: 85%;
+            max-width: 400px;
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 弹窗标题 */
+        .popup-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #9370DB;
+            margin-bottom: 15px;
+        }
+
+        /* 弹窗内容 */
+        .popup-content {
+            font-size: 15px;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* 确认按钮 */
+        .popup-btn {
+            padding: 8px 30px;
+            background-color: #9370DB;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
         /* 顶部栏 */
         .top-bar {
             display: flex;
@@ -151,6 +203,17 @@
     </style>
 </head>
 <body>
+    <!-- 公告弹窗 -->
+    <div class="popup-mask" id="popupMask">
+        <div class="popup-container">
+            <div class="popup-title">公告</div>
+            <div class="popup-content">
+                W站目前处于测试版，官方Q群970710394，满人后不会再建新群
+            </div>
+            <button class="popup-btn" onclick="closePopup()">确认</button>
+        </div>
+    </div>
+
     <!-- 顶部栏 -->
     <div class="top-bar">
         <div class="site-title">W站</div>
@@ -182,6 +245,16 @@
                 </div>
             </a>
         </div>
+        <!-- 新增快鸭_1.0.19条目 -->
+        <div class="game-item">
+            <a href="https://xiaomu1999f-cpu.github.io/xiaomu/BY.html" class="game-link">
+                <img src="By.png" alt="快鸭图标" class="game-avatar">
+                <div class="game-info">
+                    <div class="game-name">快鸭_1.0.19</div>
+                    <div class="game-meta">21.41M · 工具软件</div>
+                </div>
+            </a>
+        </div>
     </div>
 
     <!-- 底部：左“首页”（按钮样式）、右“留言板”（文字样式） -->
@@ -190,5 +263,12 @@
         <!-- 留言板保留点击跳转功能 -->
         <div class="text-style" onclick="window.location.href='https://xiaomu1999f-cpu.github.io/xiaomu/共享留言板.html'">留言板</div>
     </div>
+
+    <script>
+        // 关闭弹窗函数
+        function closePopup() {
+            document.getElementById("popupMask").style.display = "none";
+        }
+    </script>
 </body>
 </html>
