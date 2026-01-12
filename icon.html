@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>雨夜迷醉时.. - 1.0.2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #fff;
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* 顶部游戏信息区 */
+        .top-header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .game-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .game-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .tag-group {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .tag-blue {
+            background-color: #87CEFA;
+        }
+
+        .tag-pink {
+            background-color: #FFB6C1;
+        }
+
+        /* 详情标签栏 */
+        .tab-nav {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0 20px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .tab.active {
+            font-weight: bold;
+            border-bottom: 2px solid #333;
+            padding-bottom: 3px;
+        }
+
+        /* 游戏预览图区域 */
+        .preview-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .preview-img {
+            flex: 1;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        /* 游戏简介区域 */
+        .intro-area {
+            margin-bottom: 30px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .intro-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .intro-content {
+            font-size: 14px;
+            white-space: pre-line;
+        }
+
+        /* 立即下载按钮 */
+        .download-btn {
+            display: block;
+            width: 80%;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            background-color: #1E90FF;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 0 auto 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部游戏信息 -->
+    <div class="top-header">
+        <img src="icon_foreground.png" alt="游戏图标" class="game-avatar">
+        <h1 class="game-title">雨夜迷醉时.. - 1.0.2</h1>
+        <div class="tag-group">
+            <span class="tag tag-blue">290.81</span>
+            <span class="tag tag-pink">绅士游戏</span>
+        </div>
+    </div>
+
+    <!-- 仅保留详情标签 -->
+    <div class="tab-nav">
+        <span class="tab active">详情</span>
+    </div>
+
+    <!-- 游戏预览图 -->
+    <div class="preview-area">
+        <img src="game-preview1.png" alt="游戏预览" class="preview-img">
+        <img src="game-preview2.png" alt="游戏预览" class="preview-img">
+    </div>
+
+    <!-- 游戏简介 -->
+    <div class="intro-area">
+        <h2 class="intro-title">游戏简介：</h2>
+        <p class="intro-content">游戏介绍:
+一个雨夜将你带到了一间小酒吧。当走进其中时，你听到了舒缓的音乐声。你的目光落在了吧台前的美丽少女身上。了解小满并和她分享你的故事，这个难忘的夜晚将永远铭刻在你的回忆之中。
+
+旅途中的一个雨夜，你迷路了，无意进入了一间酒吧。雨点滴落到地面的声音还没有被门隔绝的那一瞬，你的目光已经落在了名叫“满”的神秘少女身上。喝了几杯酒之后，你们认识了，你们不断切换着话题，随着环境在思绪中消退，仿佛这世界只剩下了你和你富有魅力的同伴，化成了一个难忘的夜晚回忆。
+
+根据你点的鸡尾酒的区别，谈话的主题也会有所不同。你和小满的交谈会随着选项的变化而逐渐延伸。你是想要来杯蔚蓝日落或是宇宙空间？随着故事走到结局，观赏今夜到底会走向何方。</p>
+    </div>
+
+    <!-- 下载按钮 -->
+    <a href="https://pan.quark.cn/s/66460b7d52d9" target="_blank" class="download-btn">立即下载</a>
+</body>
+</html>
