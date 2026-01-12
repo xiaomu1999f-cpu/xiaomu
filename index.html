@@ -21,7 +21,7 @@
         body {
             width: 100%;
             height: 100%;
-            padding: 0 0 60px 0;
+            padding: 0 0 90px 0; /* 增加底部padding容纳两个按钮 */
             border: 4px solid #9370DB;
             border-radius: 16px;
             background-color: #fff;
@@ -126,7 +126,7 @@
         /* 游戏列表 */
         .game-list {
             padding: 20px;
-            height: calc(100% - 130px);
+            height: calc(100% - 140px); /* 适配底部双按钮高度 */
             overflow-y: auto;
         }
 
@@ -168,20 +168,19 @@
             color: #666;
         }
 
-        /* 底部容器 */
-        .bottom-btn-container {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: #fff;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* 下一页按钮样式（与之前上一页样式一致） */
+        .small-btn-style {
+            padding: 8px 30px;
+            background-color: #9370DB;
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
         }
 
-        /* 按钮样式（紫色背景+白色文字）→ 给“首页”用 */
+        /* 首页按钮样式 */
         .btn-style {
             padding: 10px 40px;
             background-color: #9370DB;
@@ -193,12 +192,37 @@
             cursor: pointer;
         }
 
-        /* 文字样式（紫色文字+无背景）→ 给“留言板”用 */
+        /* 底部右侧按钮组（下一页+留言板垂直排列） */
+        .right-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: flex-end; /* 按钮靠右对齐 */
+        }
+
+        /* 留言板按钮样式（匹配布局） */
         .text-style {
-            font-size: 18px;
+            padding: 8px 25px;
+            font-size: 16px;
             color: #9370DB;
             font-weight: 500;
             cursor: pointer;
+            border: 2px solid #9370DB;
+            border-radius: 25px;
+            background-color: #fff;
+        }
+
+        /* 底部容器 */
+        .bottom-btn-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            padding: 10px 20px 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end; /* 适配右侧垂直按钮组 */
         }
     </style>
 </head>
@@ -304,13 +328,25 @@
                 </div>
             </a>
         </div>
+        <!-- 新增夏哈塔避难日条目 -->
+        <div class="game-item">
+            <a href="https://xiaomu1999f-cpu.github.io/xiaomu/xht.html" class="game-link">
+                <img src="TU.png" alt="夏哈塔避难日图标" class="game-avatar">
+                <div class="game-info">
+                    <div class="game-name">夏哈塔避难日</div>
+                    <div class="game-meta">496.84M · 绅士游戏</div>
+                </div>
+            </a>
+        </div>
     </div>
 
-    <!-- 底部：左“首页”（按钮样式）、右“留言板”（文字样式） -->
+    <!-- 底部：左“首页”按钮、右“下一页+留言板”垂直按钮组 -->
     <div class="bottom-btn-container">
         <div class="btn-style">首页</div>
-        <!-- 留言板保留点击跳转功能 -->
-        <div class="text-style" onclick="window.location.href='https://xiaomu1999f-cpu.github.io/xiaomu/共享留言板.html'">留言板</div>
+        <div class="right-btn-group">
+            <div class="small-btn-style" onclick="window.location.href='https://xiaomu1999f-cpu.github.io/xiaomu/indd.html'">下一页</div>
+            <div class="text-style" onclick="window.location.href='https://xiaomu1999f-cpu.github.io/xiaomu/共享留言板.html'">留言板</div>
+        </div>
     </div>
 
     <script>
