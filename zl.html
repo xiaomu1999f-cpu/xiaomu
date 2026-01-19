@@ -85,11 +85,13 @@
             box-shadow: 0 0 8px rgba(173, 216, 230, 0.5);
             border-radius: 2px;
             min-width: 100px;
+            margin: 0 5px 15px; /* 优化按钮排版，避免挤在一起 */
         }
         .send-btn {
             padding: 10px 15px;
             font-size: 10px;
             min-width: 90px;
+            margin: 0; /* 恢复发送按钮原有间距 */
         }
         @media (max-width: 320px) {
             .input-container {
@@ -120,11 +122,11 @@
     <button class="btn refresh-btn" onclick="generateCommand()">刷新指令</button>
 
     <script type="module">
-        // 1. 导入Firebase模块（共享功能依赖）
+        // 1. 导入Firebase模块（改用get方法，更适合单次获取）
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-        import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+        import { getDatabase, ref, push, get } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 
-        // 2. 配置你的Firebase（已填入你的信息）
+        // 2. 配置你的Firebase（已正确填入信息）
         const firebaseConfig = {
             apiKey: "AIzaSyC00L7g1DogXC9--qijbSjTf4wk-OOCznc",
             authDomain: "xiaomo-42f9e.firebaseapp.com",
@@ -135,12 +137,12 @@
             databaseURL: "https://xiaomo-42f9e-default-rtdb.firebaseio.com/"
         };
 
-        // 3. 初始化Firebase和数据库
+        // 3. 初始化Firebase和数据库（无问题）
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
-        const commandsRef = ref(database, 'commands'); // 指令存储在数据库的commands节点
+        const commandsRef = ref(database, 'commands'); // 指令存储节点正确
 
-        // 初始指令库（首次加载会自动同步到数据库）
+        // 初始指令库（无问题）
         const initialCommands = [
             "原地做50个深蹲并学鸡叫到声音沙哑",
             "用舌头舔自己的手肘，坚持10秒",
@@ -164,45 +166,53 @@
             "把你的手机放在头顶，坚持5分钟不能掉下来"
         ];
 
-        // 4. 首次加载：如果数据库是空的，自动导入初始指令
-        onValue(commandsRef, (snapshot) => {
+        // 4. 首次加载：改用get方法检查数据库（更高效，避免持续监听）
+        get(commandsRef).then((snapshot) => {
             if (!snapshot.exists()) {
                 initialCommands.forEach(cmd => push(commandsRef, cmd));
             }
-        }, { onlyOnce: true });
+        }).catch((error) => {
+            console.log("初始化指令失败：", error);
+        });
 
-        // 5. 生成随机指令（从共享数据库拉取，保留原有样式）
+        // 5. 修复：改用get方法拉取数据，避免重复监听
         function generateCommand() {
-            onValue(commandsRef, (snapshot) => {
+            get(commandsRef).then((snapshot) => {
                 const cmdList = [];
                 snapshot.forEach(child => cmdList.push(child.val()));
                 
                 if (cmdList.length > 0) {
                     const randomIndex = Math.floor(Math.random() * cmdList.length);
-                    // 保留你原来的前缀样式
                     document.getElementById('commandDisplay').innerHTML = 
                         `<span class="command-prefix">指令：</span>${cmdList[randomIndex]}`;
                 } else {
                     document.getElementById('commandDisplay').innerHTML = 
                         `<span class="command-prefix">指令：</span>还没人提交指令，快成为第一个离谱的人！`;
                 }
+            }).catch((error) => {
+                alert("刷新指令失败：" + error.message); // 新增错误提示
             });
         }
 
-        // 6. 提交指令到共享数据库（保留原有提示语）
+        // 6. 修复：添加错误处理，失败时提示用户
         function submitCommand() {
             const input = document.getElementById('newCommand');
             const newCmd = input.value.trim();
             if (newCmd) {
-                push(commandsRef, newCmd); // 同步到数据库（所有人可见）
-                input.value = "";
-                alert("都市的意志已收录！别人刷新就能看到~");
+                push(commandsRef, newCmd)
+                    .then(() => {
+                        input.value = "";
+                        alert("都市的意志已收录！别人刷新就能看到~");
+                    })
+                    .catch((error) => {
+                        alert("提交失败：" + error.message); // 失败提示
+                    });
             } else {
                 alert("请输入有效的指令内容哦！");
             }
         }
 
-        // 页面加载时自动显示指令
+        // 页面加载时自动显示指令（无问题）
         window.onload = generateCommand;
     </script>
 </body>
