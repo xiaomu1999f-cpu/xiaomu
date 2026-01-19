@@ -20,130 +20,87 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: center;
             min-height: 100vh;
-            padding: 20px 15px;
+            padding: 20px;
+            padding-bottom: 80px; /* 给底部警告条留出空间，避免遮挡 */
             text-align: center;
         }
-        .input-container {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 25px;
-            width: 95%;
-            max-width: 400px;
-        }
-        .custom-input {
-            flex: 1;
-            padding: 10px 12px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 11px;
-            background-color: #000;
-            color: #fff;
-            border: 2px solid #ADD8E6;
-            box-shadow: 0 0 6px rgba(173, 216, 230, 0.4);
-            outline: none;
-            border-radius: 2px;
-        }
-        .custom-input::placeholder {
-            color: #a0c8d8;
-            opacity: 0.8;
-        }
         .logo {
-            width: 150px;
+            width: 200px;
             height: auto;
-            margin-bottom: 30px;
-            filter: drop-shadow(0 0 8px #ADD8E6);
+            margin-bottom: 40px;
+            filter: drop-shadow(0 0 10px #ADD8E6);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .logo:hover {
+            transform: scale(1.05);
         }
         .command {
-            font-size: 14px;
-            line-height: 1.7;
-            margin-bottom: 30px;
-            width: 95%;
-            max-width: 450px;
-            padding: 15px;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            max-width: 800px;
+            padding: 20px;
             border: 2px solid #ADD8E6;
             background-color: rgba(0, 0, 0, 0.8);
-            box-shadow: 0 0 15px rgba(173, 216, 230, 0.3);
+            box-shadow: 0 0 20px rgba(173, 216, 230, 0.3);
+            cursor: pointer;
+            transition: box-shadow 0.2s ease;
         }
-        /* 指令前缀样式：蓝白色高亮，显眼突出 */
+        .command:hover {
+            box-shadow: 0 0 25px rgba(173, 216, 230, 0.5);
+        }
         .command-prefix {
-            color: #ADD8E6; /* 浅蓝色 */
-            text-shadow: 0 0 6px #FFFFFF; /* 白色光晕，增强显眼度 */
-            font-size: 16px; /* 比正文稍大 */
+            color: #ADD8E6;
             font-weight: bold;
             margin-right: 8px;
         }
-        .btn {
-            font-family: 'Press Start 2P', cursive;
-            padding: 11px 18px;
-            background-color: #ADD8E6;
-            color: #000;
-            border: none;
-            cursor: pointer;
+        /* 新增：底部警告条样式 */
+        .warning-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.95);
+            color: #ff4444; /* 红色文字，增强警告感 */
             font-size: 12px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 8px rgba(173, 216, 230, 0.5);
-            border-radius: 2px;
-            min-width: 100px;
-            margin: 0 5px 15px; /* 优化按钮排版，避免挤在一起 */
+            padding: 15px 10px;
+            text-align: center;
+            border-top: 2px solid #ff4444;
+            box-shadow: 0 -2px 10px rgba(255, 68, 68, 0.5);
+            z-index: 9999; /* 确保始终在最上层，不被遮挡 */
+            line-height: 1.5;
         }
-        .send-btn {
-            padding: 10px 15px;
-            font-size: 10px;
-            min-width: 90px;
-            margin: 0; /* 恢复发送按钮原有间距 */
+        /* 隐藏音频控件 */
+        #bgMusic {
+            display: none;
         }
-        @media (max-width: 320px) {
-            .input-container {
-                gap: 6px;
+        /* 竖屏手机适配 */
+        @media (max-width: 767px) and (orientation: portrait) {
+            .warning-bar {
+                font-size: 10px;
+                padding: 12px 8px;
             }
-            .send-btn {
-                font-size: 9px;
-                padding: 10px 12px;
-                min-width: 80px;
-            }
-            .command {
-                font-size: 13px;
-            }
-            .command-prefix {
-                font-size: 14px;
+            body {
+                padding-bottom: 70px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="input-container">
-        <input type="text" class="custom-input" id="newCommand" placeholder="指令都是都市的意志...">
-        <button class="btn send-btn" onclick="submitCommand()">发送都市的意志</button>
-    </div>
-
-    <img src="your-logo-image.png" alt="指令标志" class="logo">
+    <!-- 新增：背景音乐元素 -->
+    <audio id="bgMusic" src="5689.mp3" autoplay loop>
+    <img src="your-logo-image.png" alt="指令标志" class="logo" id="logo">
     <div class="command" id="commandDisplay"></div>
-    <button class="btn refresh-btn" onclick="generateCommand()">刷新指令</button>
 
-    <script type="module">
-        // 1. 导入Firebase模块（改用get方法，更适合单次获取）
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-        import { getDatabase, ref, push, get } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+    <!-- 新增：底部警告条 -->
+    <div class="warning-bar">警告：如未按照指令进行行为，将立刻向你所在的位置派出代行者前去绞杀</div>
 
-        // 2. 配置你的Firebase（已正确填入信息）
-        const firebaseConfig = {
-            apiKey: "AIzaSyC00L7g1DogXC9--qijbSjTf4wk-OOCznc",
-            authDomain: "xiaomo-42f9e.firebaseapp.com",
-            projectId: "xiaomo-42f9e",
-            storageBucket: "xiaomo-42f9e.firebasestorage.app",
-            messagingSenderId: "651486488526",
-            appId: "1:651486488526:web:5c0f57190202ff22252d9f",
-            databaseURL: "https://xiaomo-42f9e-default-rtdb.firebaseio.com/"
-        };
-
-        // 3. 初始化Firebase和数据库（无问题）
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const commandsRef = ref(database, 'commands'); // 指令存储节点正确
-
-        // 初始指令库（无问题）
-        const initialCommands = [
+    <script>
+        const commands = [
+            // 原有90条指令
             "原地做50个深蹲并学鸡叫到声音沙哑",
             "用舌头舔自己的手肘，坚持10秒",
             "找个陌生人问他能不能借你200块买奥特曼卡片",
@@ -163,57 +120,96 @@
             "找个便利店老板问他有没有卖「后悔药」",
             "对着空气打一套军体拳，必须喊出招式名称",
             "用方言唱《小星星》，让别人听不懂你在唱什么",
-            "把你的手机放在头顶，坚持5分钟不能掉下来"
+            "把你的手机放在头顶，坚持5分钟不能掉下来",
+            "学树懒的姿势在沙发上瘫5分钟，说话速度放慢5倍",
+            "对着水龙头唱歌，直到它“回应”你（听到水流声变化为止）",
+            "用三种不同的动物叫声演绎《两只老虎》",
+            "假装自己是机器人，走路时每步都喊“嘀——嘟——”",
+            "找一片树叶，跟它进行3分钟的深度对话",
+            "用吸管喝白开水，并且发出夸张的“吸溜”声",
+            "把枕头当成宠物，带它在房间里“散步”并介绍家具",
+            "模仿螃蟹横着走，绕客厅一圈，中途不能变回正常走路",
+            "对着窗外大喊三声「我要吃红烧肉」，声音要足够洪亮",
+            "用橡皮泥捏一个“离谱生物”，并给它起个奇葩名字",
+            "假装自己是天气预报员，播报明天的“心情天气”",
+            "蹲在墙角跟蚂蚁打招呼，问它们要不要一起“干饭”",
+            "用筷子敲碗，演奏一段你自创的“离谱进行曲”",
+            "把家里的椅子当成马，骑上去“策马奔腾”半分钟",
+            "对着镜子做10个不同的鬼脸，每个都要丑到自己笑",
+            "学鹦鹉重复身边人说的最后一句话，坚持10分钟",
+            "用卫生纸卷当话筒，表演一段激情四射的脱口秀",
+            "假装自己是快递员，给自己家敲门并喊「你的离谱快递到了」",
+            "在纸上画一个大饼，然后假装津津有味地啃3口",
+            "模仿青蛙跳，从卧室到厨房，中途不能落地走路",
+            "对着冰箱说晚安，并且给它盖一层布当“被子”",
+            "用方言念绕口令《八百标兵奔北坡》，越绕越好笑",
+            "把袜子套在手上当手套，然后“一本正经”地做家务",
+            "假装自己是外星人，用“外星语”跟家人交流5分钟",
+            "找个瓶子，对着它许愿，然后假装它“实现”了你的愿望",
+            "学猫咪蹭腿，去蹭家里的桌子腿，还要发出呼噜声",
+            "用手机录一段自己的怪叫，然后设置成手机铃声",
+            "假装自己是树，在阳台“扎根”，风吹过时摇晃身体",
+            "找个路人夸他的鞋子好看，然后问能不能借你穿30秒",
+            "用身体比划26个英文字母，每个字母都要让人一眼认出来",
+            "抱着西瓜蹲在门口，跟路过的人说这是你刚认的“瓜儿子”",
+            "用衣架当吉他，弹唱《爱情买卖》并做出深情流泪的表情",
+            "在超市里对着方便面鞠躬，嘴里念叨「感谢泡面拯救我的胃」",
+            "模仿苍蝇嗡嗡叫，围着你朋友飞3分钟，还要时不时“停”在他身上",
+            "把牙膏挤在饼干上吃下去，吃完后必须说「这是人间美味」",
+            "假装自己是电梯，开合手臂并发出“叮咚”声，接送家人上下楼",
+            "找个井盖，蹲在旁边跟它商量「能不能借我点地下的宝藏」",
+            "用拖把当麦克风，在客厅开演唱会，曲目必须是《好汉歌》",
+            "学蜗牛的速度爬完整个房间，中途还要假装“遇到天敌”缩起来",
+            "对着马桶唱歌，必须唱到你觉得它“满意”为止（自己脑补反馈）",
+            "把家里的拖鞋摆成一排，然后挨个给它们起名字并问好",
+            "假装自己是一块石头，在院子里一动不动待10分钟，有人问就说「我在晒太阳」",
+            "用方言给你的盆栽讲童话故事，至少讲够5分钟",
+            "模仿鸡下蛋的姿势蹲在地上，然后大喊「我下蛋啦」并假装捡起鸡蛋",
+            "在公交车上（如果敢的话）突然站起来喊「我是超人」，然后坐下",
+            "把袜子套在头上当帽子，去便利店买一瓶水，全程不能笑",
+            "假装自己是闹钟，每隔1分钟就喊一次「起床啦」，坚持10分钟",
+            "用两个勺子敲自己的头，边敲边说「我是木鱼，快来敲我许愿」",
+            "找个塑料袋套在头上，然后跟家人说「我是来自火星的塑料袋侠」",
+            "模仿企鹅走路去倒垃圾，中途不能走正常步伐",
+            "对着镜子里的自己求婚，台词要肉麻到起鸡皮疙瘩",
+            "把家里的遥控器藏起来，然后假装自己是侦探找线索，还要自言自语",
+            "用粉笔在地上画一个圈，然后站在里面说「这是我的魔法结界」",
+            "学狼叫，叫到邻居开窗看你为止，然后赶紧躲起来",
+            "假装自己是外卖员，给自己打电话说「你的奶茶到了，下来取」",
+            "把枕头塞进衣服里假装怀孕，然后跟家人说「我要生了，快送我去医院」",
+            "用嘴咬住一根面条，然后甩头让面条飞起来再咬住",
+            "对着空调说「谢谢你，空调侠，是你给了我第二次生命」",
+            "模仿僵尸跳着去拿零食，拿到后还要说「嗯，这脑浆真好吃」",
+            "找个路人，跟他说「我知道你是奥特曼变的，快变身给我看」",
+            "把手机调成震动，放在口袋里，然后假装手机在说话并跟它对话",
+            "用卫生纸把自己缠成木乃伊，然后在家里走来走去吓唬人",
+            "假装自己是一只狗，叼着拖鞋给家人，还要摇尾巴（用身体摇）",
+            "在公园里找个长椅，躺上去假装自己是雕塑，有人拍照就保持不动",
+            "对着月亮大喊「嫦娥姐姐，我想跟你学跳舞」，声音越大越好",
+            "用手指蘸着酱油写字，写的内容必须是「我是离谱大王」",
+            "模仿DJ打碟的动作，对着空气打碟，还要喊「左边的朋友，右边的朋友，嗨起来」",
+            "找个瓶子，把它当成麦克风，然后唱《忐忑》，必须唱得一模一样",
+            "假装自己是老师，给你的玩具熊上课，还要布置作业",
+            "把家里的灯开关反复开关10次，然后说「我在召唤神龙」"
         ];
 
-        // 4. 首次加载：改用get方法检查数据库（更高效，避免持续监听）
-        get(commandsRef).then((snapshot) => {
-            if (!snapshot.exists()) {
-                initialCommands.forEach(cmd => push(commandsRef, cmd));
-            }
-        }).catch((error) => {
-            console.log("初始化指令失败：", error);
-        });
-
-        // 5. 修复：改用get方法拉取数据，避免重复监听
         function generateCommand() {
-            get(commandsRef).then((snapshot) => {
-                const cmdList = [];
-                snapshot.forEach(child => cmdList.push(child.val()));
-                
-                if (cmdList.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * cmdList.length);
-                    document.getElementById('commandDisplay').innerHTML = 
-                        `<span class="command-prefix">指令：</span>${cmdList[randomIndex]}`;
-                } else {
-                    document.getElementById('commandDisplay').innerHTML = 
-                        `<span class="command-prefix">指令：</span>还没人提交指令，快成为第一个离谱的人！`;
-                }
-            }).catch((error) => {
-                alert("刷新指令失败：" + error.message); // 新增错误提示
+            const randomIndex = Math.floor(Math.random() * commands.length);
+            document.getElementById('commandDisplay').innerHTML = 
+                `<span class="command-prefix">指令：</span>${commands[randomIndex]}`;
+        }
+
+        window.onload = function() {
+            generateCommand();
+            document.getElementById('commandDisplay').addEventListener('click', generateCommand);
+            document.getElementById('logo').addEventListener('click', generateCommand);
+            
+            // 兼容浏览器自动播放策略：用户点击页面元素时也触发播放
+            document.addEventListener('click', () => {
+                const bgMusic = document.getElementById('bgMusic');
+                bgMusic.play().catch(err => console.log(err));
             });
         }
-
-        // 6. 修复：添加错误处理，失败时提示用户
-        function submitCommand() {
-            const input = document.getElementById('newCommand');
-            const newCmd = input.value.trim();
-            if (newCmd) {
-                push(commandsRef, newCmd)
-                    .then(() => {
-                        input.value = "";
-                        alert("都市的意志已收录！别人刷新就能看到~");
-                    })
-                    .catch((error) => {
-                        alert("提交失败：" + error.message); // 失败提示
-                    });
-            } else {
-                alert("请输入有效的指令内容哦！");
-            }
-        }
-
-        // 页面加载时自动显示指令（无问题）
-        window.onload = generateCommand;
     </script>
 </body>
 </html>
