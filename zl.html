@@ -57,25 +57,21 @@
             font-weight: bold;
             margin-right: 8px;
         }
-        /* 新增：底部警告条样式 */
+        /* 新增：底部警告条样式 - 改为淡蓝色 */
         .warning-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background-color: rgba(0, 0, 0, 0.95);
-            color: #ff4444; /* 红色文字，增强警告感 */
+            color: #ADD8E6; /* 淡蓝色文字 */
             font-size: 12px;
             padding: 15px 10px;
             text-align: center;
-            border-top: 2px solid #ff4444;
-            box-shadow: 0 -2px 10px rgba(255, 68, 68, 0.5);
+            border-top: 2px solid #ADD8E6; /* 淡蓝色边框 */
+            box-shadow: 0 -2px 10px rgba(173, 216, 230, 0.5); /* 淡蓝色阴影 */
             z-index: 9999; /* 确保始终在最上层，不被遮挡 */
             line-height: 1.5;
-        }
-        /* 隐藏音频控件 */
-        #bgMusic {
-            display: none;
         }
         /* 竖屏手机适配 */
         @media (max-width: 767px) and (orientation: portrait) {
@@ -90,8 +86,6 @@
     </style>
 </head>
 <body>
-    <!-- 新增：背景音乐元素 -->
-    <audio id="bgMusic" src="5689.mp3" autoplay loop>
     <img src="your-logo-image.png" alt="指令标志" class="logo" id="logo">
     <div class="command" id="commandDisplay"></div>
 
@@ -101,14 +95,14 @@
     <script>
         const commands = [
             // 原有90条指令
-            "原地做50个深蹲并学鸡叫到声音沙哑",
-            "用舌头舔自己的手肘，坚持10秒",
-            "找个陌生人问他能不能借你200块买奥特曼卡片",
-            "对着镜子说20遍「我是宇宙无敌大笨蛋」",
+            "向你最喜欢的女生表白，直到她“同意”或者“拒绝”为止",
+            "去往任意一家便利店的厕所捅自己两刀，然后若无其事的走出来",
+            "给星期四第1个问你要疯狂星期四vo50的人v他50",
+            "对着镜子说20遍「我是正常人」",
             "单脚跳着从房间一头走到另一头，途中不能落地",
-            "给你的宠物读一首情诗，必须声情并茂",
+            "原地转圈800下，并且转完后不能倒下",
             "用屁股在地上写自己的名字，要让别人能认出来",
-            "找个垃圾桶并对它说「你今天看起来真好看」",
+            "给你今天第1个登录的游戏充值任意金额",
             "原地转15圈然后尝试走直线，不能摔倒",
             "打电话给你的前任并祝他/她生日快乐（即使不是生日）",
             "用嘴叼着笔写「我是猪」，必须写得工整",
@@ -157,8 +151,8 @@
             "模仿苍蝇嗡嗡叫，围着你朋友飞3分钟，还要时不时“停”在他身上",
             "把牙膏挤在饼干上吃下去，吃完后必须说「这是人间美味」",
             "假装自己是电梯，开合手臂并发出“叮咚”声，接送家人上下楼",
-            "找个井盖，蹲在旁边跟它商量「能不能借我点地下的宝藏」",
-            "用拖把当麦克风，在客厅开演唱会，曲目必须是《好汉歌》",
+            "拆散一对男同，并警告他们以后不能再这么做",
+            "走到大街上见到的第1个女生，并亲吻她",
             "学蜗牛的速度爬完整个房间，中途还要假装“遇到天敌”缩起来",
             "对着马桶唱歌，必须唱到你觉得它“满意”为止（自己脑补反馈）",
             "把家里的拖鞋摆成一排，然后挨个给它们起名字并问好",
@@ -187,8 +181,8 @@
             "在公园里找个长椅，躺上去假装自己是雕塑，有人拍照就保持不动",
             "对着月亮大喊「嫦娥姐姐，我想跟你学跳舞」，声音越大越好",
             "用手指蘸着酱油写字，写的内容必须是「我是离谱大王」",
-            "模仿DJ打碟的动作，对着空气打碟，还要喊「左边的朋友，右边的朋友，嗨起来」",
-            "找个瓶子，把它当成麦克风，然后唱《忐忑》，必须唱得一模一样",
+            "和朋友吵架，直到朋友不回怼为止",
+            "假装自己是一条鱼，并且在水中待一分钟",
             "假装自己是老师，给你的玩具熊上课，还要布置作业",
             "把家里的灯开关反复开关10次，然后说「我在召唤神龙」"
         ];
@@ -203,12 +197,6 @@
             generateCommand();
             document.getElementById('commandDisplay').addEventListener('click', generateCommand);
             document.getElementById('logo').addEventListener('click', generateCommand);
-            
-            // 兼容浏览器自动播放策略：用户点击页面元素时也触发播放
-            document.addEventListener('click', () => {
-                const bgMusic = document.getElementById('bgMusic');
-                bgMusic.play().catch(err => console.log(err));
-            });
         }
     </script>
 </body>
