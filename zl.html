@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>传令员</title>
+    <title>离谱指令生成器</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -23,8 +23,20 @@
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
-            padding-bottom: 80px; /* 给底部警告条留出空间，避免遮挡 */
-            text-align: center;
+            padding-bottom: 80px;
+            text-align: left;
+            overflow-x: hidden;
+        }
+        /* 缓慢亮解动画（从透明到不透明） */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        /* 增强蓝色光晕动画（呼吸效果） */
+        @keyframes glow {
+            0% { filter: drop-shadow(0 0 10px #ADD8E6); }
+            50% { filter: drop-shadow(0 0 25px #ADD8E6); }
+            100% { filter: drop-shadow(0 0 10px #ADD8E6); }
         }
         .logo {
             width: 200px;
@@ -33,21 +45,52 @@
             filter: drop-shadow(0 0 10px #ADD8E6);
             cursor: pointer;
             transition: transform 0.2s ease;
+            animation: fadeIn 3s ease forwards; /* 3秒缓慢亮解 */
+            opacity: 0; /* 初始透明 */
         }
         .logo:hover {
             transform: scale(1.05);
+        }
+        /* 点击查看按钮：去除边框+增强蓝色光亮度+呼吸光晕 */
+        .click-to-view {
+            font-size: 16px;
+            color: #ADD8E6;
+            font-weight: bold;
+            cursor: pointer;
+            animation: fadeIn 3s ease forwards 0.5s, glow 2s infinite; /* 亮解+呼吸光晕 */
+            opacity: 0;
+            text-align: center;
+            padding: 15px 30px;
+            /* 去掉边框 */
+            background-color: rgba(0, 0, 0, 0.8);
+            /* 增强蓝色光感：扩大阴影范围+提高亮度 */
+            box-shadow: 0 0 30px rgba(173, 216, 230, 0.6);
+            border-radius: 4px;
+            transition: box-shadow 0.3s ease;
+        }
+        /*  hover时进一步增强光效 */
+        .click-to-view:hover {
+            box-shadow: 0 0 40px rgba(173, 216, 230, 0.8);
         }
         .command {
             font-size: 16px;
             line-height: 1.8;
             margin-bottom: 40px;
-            max-width: 800px;
-            padding: 20px;
+            max-width: fit-content;
+            min-width: 280px;
+            padding: 15px;
             border: 2px solid #ADD8E6;
             background-color: rgba(0, 0, 0, 0.8);
             box-shadow: 0 0 20px rgba(173, 216, 230, 0.3);
             cursor: pointer;
             transition: box-shadow 0.2s ease;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: fadeIn 3s ease forwards; /* 点击后3秒亮解 */
+            opacity: 0; /* 初始透明，点击后显示 */
+            display: none; /* 初始隐藏 */
         }
         .command:hover {
             box-shadow: 0 0 25px rgba(173, 216, 230, 0.5);
@@ -55,25 +98,28 @@
         .command-prefix {
             color: #ADD8E6;
             font-weight: bold;
-            margin-right: 8px;
+            flex-shrink: 0;
         }
-        /* 新增：底部警告条样式 - 改为淡蓝色 */
+        .command-content {
+            word-wrap: break-word;
+        }
         .warning-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background-color: rgba(0, 0, 0, 0.95);
-            color: #ADD8E6; /* 淡蓝色文字 */
+            color: #ADD8E6;
             font-size: 12px;
             padding: 15px 10px;
             text-align: center;
-            border-top: 2px solid #ADD8E6; /* 淡蓝色边框 */
-            box-shadow: 0 -2px 10px rgba(173, 216, 230, 0.5); /* 淡蓝色阴影 */
-            z-index: 9999; /* 确保始终在最上层，不被遮挡 */
+            border-top: 2px solid #ADD8E6;
+            box-shadow: 0 -2px 10px rgba(173, 216, 230, 0.5);
+            z-index: 9999;
             line-height: 1.5;
+            animation: fadeIn 3s ease forwards 1s; /* 延迟1秒亮解 */
+            opacity: 0;
         }
-        /* 竖屏手机适配 */
         @media (max-width: 767px) and (orientation: portrait) {
             .warning-bar {
                 font-size: 10px;
@@ -82,19 +128,37 @@
             body {
                 padding-bottom: 70px;
             }
+            .command {
+                font-size: 12px;
+                min-height: 70px;
+                padding: 12px;
+                min-width: 240px;
+            }
+            .click-to-view {
+                font-size: 12px;
+                padding: 12px 20px;
+                box-shadow: 0 0 20px rgba(173, 216, 230, 0.6);
+            }
+            .click-to-view:hover {
+                box-shadow: 0 0 30px rgba(173, 216, 230, 0.8);
+            }
         }
     </style>
 </head>
 <body>
     <img src="your-logo-image.png" alt="指令标志" class="logo" id="logo">
-    <div class="command" id="commandDisplay"></div>
+    <!-- 点击查看容器（初始显示） -->
+    <div class="click-to-view" id="clickToView">点击查看</div>
+    <!-- 指令容器（初始隐藏） -->
+    <div class="command" id="commandDisplay">
+        <div class="command-prefix">指令：</div>
+        <div class="command-content"></div>
+    </div>
 
-    <!-- 新增：底部警告条 -->
     <div class="warning-bar">警告：如未按照指令进行行为，将立刻向你所在的位置派出代行者前去绞杀</div>
 
     <script>
         const commands = [
-            // 原有90条指令
             "向你最喜欢的女生表白，直到她“同意”或者“拒绝”为止",
             "去往任意一家便利店的厕所捅自己两刀，然后若无其事的走出来",
             "给星期四第1个问你要疯狂星期四vo50的人v他50",
@@ -187,16 +251,121 @@
             "···在今天向你暗恋的人表白，并向右跳一下"
         ];
 
-        function generateCommand() {
-            const randomIndex = Math.floor(Math.random() * commands.length);
-            document.getElementById('commandDisplay').innerHTML = 
-                `<span class="command-prefix">指令：</span>${commands[randomIndex]}`;
+        let typingTimer = null;
+        // Web Audio API 生成BB机“逼逼逼”音效（高频、短促、尖锐）
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        function playTypeSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            // BB机音效核心参数：高频锯齿波（尖锐）、短促时长（30ms）
+            oscillator.type = 'sawtooth'; // 锯齿波，比方波更接近BB机的尖锐声
+            oscillator.frequency.setValueAtTime(1400, audioContext.currentTime); // 1400Hz高频，模拟“逼”声
+            oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.02); // 轻微降频，更自然
+            
+            // 音量控制：短促爆发，避免刺耳
+            gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.03); // 30ms时长，短促有力
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.03); // 严格控制时长，避免拖尾
+            
+            // 额外添加一个微弱的回声（可选），增强BB机的复古感
+            setTimeout(() => {
+                const echoOsc = audioContext.createOscillator();
+                const echoGain = audioContext.createGain();
+                echoOsc.type = 'sawtooth';
+                echoOsc.frequency.setValueAtTime(1000, audioContext.currentTime);
+                echoGain.gain.setValueAtTime(0.05, audioContext.currentTime);
+                echoGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.02);
+                echoOsc.connect(echoGain);
+                echoGain.connect(audioContext.destination);
+                echoOsc.start();
+                echoOsc.stop(audioContext.currentTime + 0.02);
+            }, 20);
         }
 
+        // 生成随机乱码（严格匹配真实指令长度）
+        function generateGibberish(length) {
+            let gibberish = '';
+            // 只生成视觉上更像乱码的字符（符号+大小写字母+数字）
+            const gibberishChars = '!@#$%^&*()_+-=[]{}|;:,.<>?`~abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            for (let i = 0; i < length; i++) {
+                gibberish += gibberishChars[Math.floor(Math.random() * gibberishChars.length)];
+            }
+            return gibberish;
+        }
+
+        // 乱码转真实指令（确保无残留）
+        function typeWriterWithGibberish(el, realText, speed = 80) {
+            // 强制清空容器，避免旧内容残留
+            el.innerHTML = '';
+            // 生成与真实指令长度完全一致的乱码
+            const gibberish = generateGibberish(realText.length);
+            el.innerHTML = gibberish;
+            
+            let index = 0;
+            if (typingTimer) clearInterval(typingTimer);
+            
+            typingTimer = setInterval(() => {
+                if (index < realText.length) {
+                    // 逐字替换乱码为真实字符（精确控制替换位置）
+                    el.innerHTML = `${el.innerHTML.substring(0, index)}${realText.charAt(index)}${el.innerHTML.substring(index + 1)}`;
+                    playTypeSound(); // 播放BB机音效
+                    index++;
+                } else {
+                    // 关键修复：循环结束后强制赋值真实指令，彻底清除可能的残留
+                    el.innerHTML = realText;
+                    clearInterval(typingTimer);
+                    typingTimer = null;
+                }
+            }, Math.random() * 40 + speed);
+        }
+
+        // 生成指令（含乱码转真实效果）
+        function generateCommand() {
+            const contentEl = document.querySelector('.command-content');
+            const randomIndex = Math.floor(Math.random() * commands.length);
+            const randomCmd = commands[randomIndex];
+            // 每次生成前强制清空，避免乱码残留
+            contentEl.innerHTML = '';
+            // 先显示乱码，再转真实指令
+            typeWriterWithGibberish(contentEl, randomCmd);
+        }
+
+        // 页面加载初始化
         window.onload = function() {
-            generateCommand();
-            document.getElementById('commandDisplay').addEventListener('click', generateCommand);
-            document.getElementById('logo').addEventListener('click', generateCommand);
+            const clickToView = document.getElementById('clickToView');
+            const commandDisplay = document.getElementById('commandDisplay');
+
+            // 点击“点击查看”触发
+            clickToView.addEventListener('click', () => {
+                // 隐藏点击查看，显示指令容器
+                clickToView.style.display = 'none';
+                commandDisplay.style.display = 'flex';
+                // 激活音频上下文（浏览器安全限制）
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                // 生成指令（乱码转真实）
+                generateCommand();
+            });
+
+            // 点击指令容器/LOGO刷新指令
+            commandDisplay.addEventListener('click', () => {
+                // 刷新时先显示新乱码，再替换
+                generateCommand();
+            });
+            document.getElementById('logo').addEventListener('click', () => {
+                clickToView.style.display = 'none';
+                commandDisplay.style.display = 'flex';
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                generateCommand();
+            });
         }
     </script>
 </body>
