@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>生死对决-俄罗斯轮盘赌</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8B0000',
+                        secondary: '#374151',
+                        accent: '#D97706',
+                        dark: '#1F2937',
+                        light: '#F9FAFB',
+                        danger: '#DC2626',
+                        success: '#16A34A',
+                        item: '#059669'
+                    },
+                    fontFamily: {
+                        western: ['Georgia', 'serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            }
+            .gun-shake {
+                animation: gunShake 0.3s ease-in-out;
+            }
+            .gun-fire {
+                animation: gunFire 0.4s ease-in-out;
+            }
+            .death-shake {
+                animation: deathShake 0.6s ease-in-out;
+            }
+            .fade-in {
+                animation: fadeIn 0.8s ease-in-out;
+            }
+            .pulse-glow {
+                animation: pulseGlow 2s infinite;
+            }
+            .safe-area-bottom {
+                padding-bottom: env(safe-area-inset-bottom, 24px);
+            }
+            .safe-area-top {
+                padding-top: env(safe-area-inset-top, 16px);
+            }
+            .muzzle-flash {
+                animation: muzzleFlash 0.2s ease-out;
+            }
+            .damage-flash {
+                animation: damageFlash 0.5s ease-in-out;
+            }
+            .item-glow {
+                animation: itemGlow 1.5s infinite;
+            }
+        }
+
+        @keyframes gunShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            75% { transform: translateX(3px); }
+        }
+
+        @keyframes gunFire {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.15); filter: brightness(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes deathShake {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            20% { transform: translateX(-8px) rotate(-2deg); }
+            40% { transform: translateX(8px) rotate(2deg); }
+            60% { transform: translateX(-6px) rotate(-1deg); }
+            80% { transform: translateX(6px) rotate(1deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(217, 119, 6, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(217, 119, 6, 0.8); }
+        }
+
+        @keyframes muzzleFlash {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.5); }
+        }
+
+        @keyframes damageFlash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @keyframes itemGlow {
+            0%, 100% { box-shadow: 0 0 4px rgba(5, 150, 105, 0.4); }
+            50% { box-shadow: 0 0 12px rgba(5, 150, 105, 0.7); }
+        }
+
+        body {
+            background-color: #FFFFFF;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            overflow-y: auto;
+            min-height: 100vh;
+        }
+
+        .bullet-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #9CA3AF;
+        }
+
+        .bullet-real {
+            background-color: #D97706;
+            border-color: #B45309;
+        }
+
+        .bullet-blank {
+            background-color: #E5E7EB;
+            border-color: #9CA3AF;
+        }
+
+        .gun-container {
+            perspective: 1000px;
+        }
+
+        .gun {
+            transition: transform 0.4s ease-in-out;
+        }
+
+        .gun-point-up {
+            transform: rotate(-15deg);
+        }
+
+        .gun-point-down {
+            transform: rotate(15deg);
+        }
+
+        .health-heart {
+            font-size: 1.25rem;
+            letter-spacing: 2px;
+        }
+
+        .item-indicator {
+            font-size: 1rem;
+            min-height: 20px;
+        }
+
+        @media (max-width: 640px) and (orientation: portrait) {
+            .game-container {
+                padding: 1.5rem !important;
+                margin: 0 0.75rem !important;
+            }
+            
+            .character {
+                font-size: 4.5rem !important;
+            }
+            
+            .gun {
+                width: 150px !important;
+                height: 75px !important;
+            }
+            
+            #player-actions {
+                flex-direction: column !important;
+                width: 100% !important;
+                gap: 12px !important;
+            }
+            
+            .control-btn {
+                min-height: 56px !important;
+                width: 100% !important;
+                font-size: 1.1rem !important;
+                padding: 0.875rem 1.25rem !important;
+                border-radius: 12px !important;
+            }
+            
+            #shoot-self-btn {
+                background-color: #4B5563 !important;
+                font-weight: 600 !important;
+            }
+            
+            #shoot-self-btn:hover {
+                background-color: #374151 !important;
+            }
+            
+            .status-text {
+                font-size: 1.1rem !important;
+                min-height: 40px !important;
+            }
+            
+            .info-text {
+                font-size: 0.95rem !important;
+            }
+            
+            .health-heart {
+                font-size: 1.4rem !important;
+            }
+        }
+
+        @media (max-width: 380px) and (orientation: portrait) {
+            .character {
+                font-size: 4rem !important;
+            }
+            
+            .gun {
+                width: 130px !important;
+                height: 65px !important;
+            }
+            
+            .control-btn {
+                min-height: 52px !important;
+                font-size: 1.05rem !important;
+            }
+        }
+
+        @media (orientation: landscape) {
+            #player-actions {
+                flex-direction: row !important;
+            }
+            
+            .control-btn {
+                width: auto !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center text-dark font-western safe-area-top safe-area-bottom" style="padding-top: 2rem; padding-bottom: 3rem;">
+    <h1 class="text-[clamp(1.8rem,6vw,3.5rem)] font-bold text-dark text-shadow mb-6 fade-in">
+        生死对决
+    </h1>
+
+    <div id="game-container" class="game-container w-full max-w-md bg-white rounded-xl p-6 shadow-xl border border-gray-200 fade-in">
+        <div id="game-status" class="status-text text-center mb-4 h-10 flex items-center justify-center font-medium text-gray-800">
+            点击"开始游戏"开始对决
+        </div>
+
+        <div id="bullet-info" class="text-center mb-6 hidden">
+            <div class="text-lg mb-2">
+                装弹: <span id="bullet-count" class="font-bold text-danger">2</span>发实弹 | <span id="blank-count" class="font-bold text-success">4</span>发空包
+            </div>
+            <div id="bullet-indicators" class="flex justify-center gap-2 mb-2">
+            </div>
+            <div class="text-sm text-gray-600">
+                剩余: <span id="remaining-chambers">6</span>发
+            </div>
+        </div>
+
+        <div class="flex flex-col items-center justify-between min-h-[380px]">
+            <div id="enemy" class="text-center mb-4 transition-all duration-500">
+                <div class="character text-5xl mb-2">🤠</div>
+                <div class="text-lg font-bold text-red-500">亡命之徒</div>
+                <div id="enemy-health" class="health-heart mb-1">❤️❤️❤️</div>
+                <div id="enemy-item" class="item-indicator text-sm text-gray-500"></div>
+                <div id="enemy-status" class="text-xs mt-1 text-gray-500">准备就绪</div>
+            </div>
+
+            <div class="gun-container relative my-6">
+                <div id="gun" class="gun w-48 h-24 relative">
+                    <div id="muzzle-flash" class="absolute top-1/2 left-0 w-16 h-16 bg-yellow-400 rounded-full opacity-0 transform -translate-y-1/2 -translate-x-1/2"></div>
+                    <div class="absolute bottom-0 left-0 right-0 h-10 bg-gray-600 rounded-lg shadow-lg"></div>
+                    <div class="absolute bottom-7 left-0 w-20 h-5 bg-gray-500 rounded-l-lg"></div>
+                    <div id="cylinder" class="absolute bottom-5 left-16 w-18 h-18 bg-gray-700 rounded-full border-4 border-gray-500"></div>
+                    <div class="absolute bottom-0 right-0 w-14 h-14 bg-gray-600 rounded-br-lg transform rotate-45 origin-bottom-right"></div>
+                </div>
+            </div>
+
+            <div id="player" class="text-center mt-4 transition-all duration-500">
+                <div class="character text-5xl mb-2">😎</div>
+                <div class="text-lg font-bold text-blue-500">你</div>
+                <div id="player-health" class="health-heart mb-1">❤️❤️❤️</div>
+                <div id="player-item" class="item-indicator text-sm text-gray-500"></div>
+                <div id="player-status" class="text-xs mt-1 text-gray-500">准备就绪</div>
+            </div>
+        </div>
+
+        <div id="controls" class="mt-6 flex flex-col justify-center items-center gap-4">
+            <button id="start-btn" class="control-btn px-8 py-3 bg-accent hover:bg-accent/90 text-white font-bold rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95 pulse-glow">
+                ▶️ 开始游戏
+            </button>
+            
+            <div id="player-actions" class="flex flex-col sm:flex-row gap-4 hidden w-full">
+                <button id="shoot-enemy-btn" class="control-btn px-6 py-3 bg-danger hover:bg-danger/90 text-white font-bold rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95">
+                    🎯 朝敌人开枪
+                </button>
+                <button id="shoot-self-btn" class="control-btn px-6 py-3 bg-secondary hover:bg-secondary/90 text-white font-bold rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95">
+                    👤 朝自己开枪
+                </button>
+            </div>
+            
+            <button id="use-item-btn" class="control-btn px-6 py-3 bg-item hover:bg-item/90 text-white font-bold rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95 hidden item-glow">
+                ✨ 使用道具
+            </button>
+            
+            <button id="restart-btn" class="control-btn px-8 py-3 bg-accent hover:bg-accent/90 text-white font-bold rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95 hidden">
+                🔄 再来一局
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-6 text-center text-gray-600 text-xs max-w-sm px-4 fade-in safe-area-bottom">
+        <p>左轮手枪装有实弹和空包弹。双方各有3条生命。</p>
+        <p class="mt-1">朝别人开枪：空包弹则轮到对方；实弹则对方掉1条命。</p>
+        <p class="mt-1">朝自己开枪：空包弹则继续你的回合；实弹则你掉1条命。</p>
+        <p class="mt-1">道具说明：🔪菜刀(实弹伤害×2) | 🔍放大镜(查看下一发子弹) | 🔧撬弹器(移除当前子弹)</p>
+        <p class="mt-1">生命值归零者失败！</p>
+    </div>
+
+    <script>
+        let audioContext;
+
+        function initAudio() {
+            if (!audioContext) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioContext = new AudioContext();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+
+        function playRealBulletSound() {
+            if (!audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(160, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(40, audioContext.currentTime + 0.35);
+            
+            gainNode.gain.setValueAtTime(0.7, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.35);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.35);
+        }
+
+        function playBlankBulletSound() {
+            if (!audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(280, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(80, audioContext.currentTime + 0.18);
+            
+            gainNode.gain.setValueAtTime(0.35, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.18);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.18);
+        }
+
+        const GAME_CONFIG = {
+            totalChambers: 6,
+            minBullets: 1,
+            maxBullets: 3,
+            maxHealth: 3,
+            items: ['knife', 'magnifier', 'prybar']
+        };
+
+        let gameState = {
+            isPlaying: false,
+            currentPlayer: 'player',
+            chambers: [],
+            currentChamberIndex: 0,
+            remainingBullets: 0,
+            remainingBlanks: 0,
+            playerHealth: GAME_CONFIG.maxHealth,
+            enemyHealth: GAME_CONFIG.maxHealth,
+            playerItem: null,
+            enemyItem: null,
+            playerItemUsed: false,
+            enemyItemUsed: false,
+            playerDoubleDamage: false,
+            enemyDoubleDamage: false
+        };
+
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const shootEnemyBtn = document.getElementById('shoot-enemy-btn');
+        const shootSelfBtn = document.getElementById('shoot-self-btn');
+        const useItemBtn = document.getElementById('use-item-btn');
+        const gameStatus = document.getElementById('game-status');
+        const playerStatus = document.getElementById('player-status');
+        const enemyStatus = document.getElementById('enemy-status');
+        const bulletInfo = document.getElementById('bullet-info');
+        const bulletCount = document.getElementById('bullet-count');
+        const blankCount = document.getElementById('blank-count');
+        const remainingChambers = document.getElementById('remaining-chambers');
+        const bulletIndicators = document.getElementById('bullet-indicators');
+        const gun = document.getElementById('gun');
+        const muzzleFlash = document.getElementById('muzzle-flash');
+        const player = document.getElementById('player');
+        const enemy = document.getElementById('enemy');
+        const playerActions = document.getElementById('player-actions');
+        const playerHealthEl = document.getElementById('player-health');
+        const enemyHealthEl = document.getElementById('enemy-health');
+        const playerItemEl = document.getElementById('player-item');
+        const enemyItemEl = document.getElementById('enemy-item');
+
+        document.addEventListener('touchend', function(event) {
+            event.preventDefault();
+        }, { passive: false });
+
+        function updateHealthUI() {
+            playerHealthEl.innerHTML = '❤️'.repeat(Math.max(0, gameState.playerHealth)) || '💀';
+            enemyHealthEl.innerHTML = '❤️'.repeat(Math.max(0, gameState.enemyHealth)) || '💀';
+        }
+
+        function updateItemUI() {
+            if (gameState.playerItem && !gameState.playerItemUsed) {
+                playerItemEl.textContent = gameState.playerItem === 'knife' ? '🔪 菜刀' : 
+                                          gameState.playerItem === 'magnifier' ? '🔍 放大镜' : '🔧 撬弹器';
+            } else {
+                playerItemEl.textContent = '';
+            }
+            
+            if (gameState.enemyItem && !gameState.enemyItemUsed) {
+                enemyItemEl.textContent = gameState.enemyItem === 'knife' ? '🔪 菜刀' : 
+                                         gameState.enemyItem === 'magnifier' ? '🔍 放大镜' : '🔧 撬弹器';
+            } else {
+                enemyItemEl.textContent = '';
+            }
+        }
+
+        function reloadGun() {
+            if (!gameState.isPlaying) return;
+            
+            gameStatus.textContent = '🔄 所有子弹已打完！重新装弹中...';
+            
+            setTimeout(() => {
+                const bulletCount = Math.floor(Math.random() * (GAME_CONFIG.maxBullets - GAME_CONFIG.minBullets + 1)) + GAME_CONFIG.minBullets;
+                const blankCount = GAME_CONFIG.totalChambers - bulletCount;
+                
+                gameState.remainingBullets = bulletCount;
+                gameState.remainingBlanks = blankCount;
+                gameState.currentChamberIndex = 0;
+                
+                gameState.chambers = Array(bulletCount).fill(true).concat(Array(blankCount).fill(false));
+                shuffleArray(gameState.chambers);
+                
+                // 重新随机分配道具
+                const items = [...GAME_CONFIG.items];
+                shuffleArray(items);
+                gameState.playerItem = items[Math.floor(Math.random() * items.length)];
+                gameState.enemyItem = items[Math.floor(Math.random() * items.length)];
+                gameState.playerItemUsed = false;
+                gameState.enemyItemUsed = false;
+                gameState.playerDoubleDamage = false;
+                gameState.enemyDoubleDamage = false;
+                
+                updateBulletInfo();
+                updateItemUI();
+                
+                gameStatus.textContent = '重新装弹完成！' + (gameState.currentPlayer === 'player' ? '你的回合！' : '敌人的回合...');
+                
+                if (gameState.currentPlayer === 'player') {
+                    playerStatus.textContent = '选择目标';
+                    enemyStatus.textContent = '等待中...';
+                    playerActions.classList.remove('hidden');
+                    if (gameState.playerItem && !gameState.playerItemUsed) {
+                        useItemBtn.classList.remove('hidden');
+                    }
+                } else {
+                    enemyStatus.textContent = '正在瞄准';
+                    playerStatus.textContent = '等待中...';
+                    playerActions.classList.add('hidden');
+                    
+                    setTimeout(() => {
+                        enemyTurn();
+                    }, 1500);
+                }
+            }, 1500);
+        }
+
+        function initGame() {
+            initAudio();
+            
+            gameState.isPlaying = true;
+            gameState.currentChamberIndex = 0;
+            gameState.playerHealth = GAME_CONFIG.maxHealth;
+            gameState.enemyHealth = GAME_CONFIG.maxHealth;
+            gameState.playerItemUsed = false;
+            gameState.enemyItemUsed = false;
+            gameState.playerDoubleDamage = false;
+            gameState.enemyDoubleDamage = false;
+
+            // 随机分配道具
+            const items = [...GAME_CONFIG.items];
+            shuffleArray(items);
+            gameState.playerItem = items[Math.floor(Math.random() * items.length)];
+            gameState.enemyItem = items[Math.floor(Math.random() * items.length)];
+            
+            const bulletCount = Math.floor(Math.random() * (GAME_CONFIG.maxBullets - GAME_CONFIG.minBullets + 1)) + GAME_CONFIG.minBullets;
+            const blankCount = GAME_CONFIG.totalChambers - bulletCount;
+            
+            gameState.remainingBullets = bulletCount;
+            gameState.remainingBlanks = blankCount;
+            
+            gameState.chambers = Array(bulletCount).fill(true).concat(Array(blankCount).fill(false));
+            shuffleArray(gameState.chambers);
+            
+            gameState.currentPlayer = Math.random() < 0.5 ? 'player' : 'enemy';
+            
+            updateBulletInfo();
+            updateHealthUI();
+            updateItemUI();
+            resetCharacters();
+            
+            startBtn.classList.add('hidden');
+            bulletInfo.classList.remove('hidden');
+            restartBtn.classList.add('hidden');
+            useItemBtn.classList.add('hidden');
+            
+            if (gameState.currentPlayer === 'player') {
+                gameStatus.textContent = '你的回合！选择目标';
+                playerStatus.textContent = '选择目标';
+                enemyStatus.textContent = '等待中...';
+                playerActions.classList.remove('hidden');
+                if (gameState.playerItem && !gameState.playerItemUsed) {
+                    useItemBtn.classList.remove('hidden');
+                }
+            } else {
+                gameStatus.textContent = '敌人的回合...';
+                enemyStatus.textContent = '正在瞄准';
+                playerStatus.textContent = '等待中...';
+                playerActions.classList.add('hidden');
+                
+                setTimeout(() => {
+                    enemyTurn();
+                }, 1500);
+            }
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function updateBulletInfo() {
+            bulletCount.textContent = gameState.remainingBullets;
+            blankCount.textContent = gameState.remainingBlanks;
+            remainingChambers.textContent = gameState.remainingBullets + gameState.remainingBlanks;
+            
+            bulletIndicators.innerHTML = '';
+            for (let i = 0; i < gameState.remainingBullets; i++) {
+                const indicator = document.createElement('div');
+                indicator.className = 'bullet-indicator bullet-real';
+                bulletIndicators.appendChild(indicator);
+            }
+            for (let i = 0; i < gameState.remainingBlanks; i++) {
+                const indicator = document.createElement('div');
+                indicator.className = 'bullet-indicator bullet-blank';
+                bulletIndicators.appendChild(indicator);
+            }
+        }
+
+        function resetCharacters() {
+            player.classList.remove('death-shake', 'damage-flash');
+            enemy.classList.remove('death-shake', 'damage-flash');
+            player.querySelector('div:first-child').textContent = '😎';
+            enemy.querySelector('div:first-child').textContent = '🤠';
+            playerStatus.textContent = '准备就绪';
+            enemyStatus.textContent = '准备就绪';
+            gun.className = 'gun w-48 h-24 relative';
+            updateHealthUI();
+        }
+
+        function usePlayerItem() {
+            if (!gameState.isPlaying || gameState.currentPlayer !== 'player' || gameState.playerItemUsed || !gameState.playerItem) return;
+            
+            gameState.playerItemUsed = true;
+            updateItemUI();
+            useItemBtn.classList.add('hidden');
+            
+            if (gameState.playerItem === 'knife') {
+                gameState.playerDoubleDamage = true;
+                gameStatus.textContent = '🔪 你使用了菜刀！下次实弹伤害翻倍！';
+            } else if (gameState.playerItem === 'magnifier') {
+                const nextBullet = gameState.chambers[gameState.currentChamberIndex];
+                gameStatus.textContent = nextBullet ? '🔍 放大镜显示：下一发是实弹！' : '🔍 放大镜显示：下一发是空包弹！';
+            } else if (gameState.playerItem === 'prybar') {
+                const removedBullet = gameState.chambers[gameState.currentChamberIndex];
+                gameState.chambers.splice(gameState.currentChamberIndex, 1);
+                
+                if (removedBullet) {
+                    gameState.remainingBullets--;
+                    gameStatus.textContent = '🔧 你使用了撬弹器！撬掉了一颗实弹！';
+                } else {
+                    gameState.remainingBlanks--;
+                    gameStatus.textContent = '🔧 你使用了撬弹器！撬掉了一颗空包弹！';
+                }
+                
+                updateBulletInfo();
+                
+                // 检查是否所有子弹都被撬完了
+                if (gameState.remainingBullets + gameState.remainingBlanks === 0) {
+                    setTimeout(() => {
+                        reloadGun();
+                    }, 1500);
+                    return;
+                }
+            }
+
+            setTimeout(() => {
+                if (gameState.isPlaying && gameState.currentPlayer === 'player') {
+                    playerStatus.textContent = '选择目标';
+                    playerActions.classList.remove('hidden');
+                }
+            }, 1500);
+        }
+
+        function shootEnemy() {
+            if (!gameState.isPlaying || gameState.currentPlayer !== 'player') return;
+            
+            playerActions.classList.add('hidden');
+            useItemBtn.classList.add('hidden');
+            gun.classList.add('gun-point-up');
+            
+            setTimeout(() => {
+                fireGun('enemy');
+            }, 400);
+        }
+
+        function shootSelf() {
+            if (!gameState.isPlaying || gameState.currentPlayer !== 'player') return;
+            
+            playerActions.classList.add('hidden');
+            useItemBtn.classList.add('hidden');
+            gun.classList.add('gun-point-down');
+            
+            setTimeout(() => {
+                fireGun('player');
+            }, 400);
+        }
+
+        function fireGun(target) {
+            const isRealBullet = gameState.chambers[gameState.currentChamberIndex];
+            
+            gun.classList.add('gun-shake');
+            muzzleFlash.classList.add('muzzle-flash');
+            
+            setTimeout(() => {
+                gun.classList.remove('gun-shake');
+                muzzleFlash.classList.remove('muzzle-flash');
+            }, 300);
+            
+            if (isRealBullet) {
+                playRealBulletSound();
+                gun.classList.add('gun-fire');
+
+                gameState.currentChamberIndex++;
+                gameState.remainingBullets--;
+                updateBulletInfo();
+                
+                setTimeout(() => {
+                    if (target === 'player') {
+                        let damage = gameState.playerDoubleDamage ? 2 : 1;
+                        gameState.playerHealth -= damage;
+                        gameState.playerDoubleDamage = false;
+
+                        player.classList.add('damage-flash');
+                        setTimeout(() => player.classList.remove('damage-flash'), 500);
+                        updateHealthUI();
+                        
+                        const damageText = damage === 2 ? '双倍伤害！' : '';
+                        gameStatus.textContent = `💥 实弹！${damageText}你受到了伤害！剩余生命：${Math.max(0, gameState.playerHealth)}`;
+                        playerStatus.textContent = '受伤';
+                        
+                        if (gameState.playerHealth <= 0) {
+                            gameState.isPlaying = false;
+                            gameStatus.textContent = '💀 你输了！你的生命值耗尽了！';
+                            playerStatus.textContent = '已死亡';
+                            player.classList.add('death-shake');
+                            player.querySelector('div:first-child').textContent = '💀';
+                            restartBtn.classList.remove('hidden');
+                            return;
+                        }
+                    } else {
+                        let damage = gameState.playerDoubleDamage ? 2 : 1;
+                        gameState.enemyHealth -= damage;
+                        gameState.playerDoubleDamage = false;
+
+                        enemy.classList.add('damage-flash');
+                        setTimeout(() => enemy.classList.remove('damage-flash'), 500);
+                        updateHealthUI();
+                        
+                        const damageText = damage === 2 ? '双倍伤害！' : '';
+                        gameStatus.textContent = `💥 实弹！${damageText}敌人受到了伤害！剩余生命：${Math.max(0, gameState.enemyHealth)}`;
+                        enemyStatus.textContent = '受伤';
+                        
+                        if (gameState.enemyHealth <= 0) {
+                            gameState.isPlaying = false;
+                            gameStatus.textContent = '🎉 你赢了！敌人的生命值耗尽了！';
+                            enemyStatus.textContent = '已死亡';
+                            enemy.classList.add('death-shake');
+                            enemy.querySelector('div:first-child').textContent = '💀';
+                            restartBtn.classList.remove('hidden');
+                            return;
+                        }
+                    }
+                    
+                    // 检查是否所有子弹都打完了
+                    if (gameState.remainingBullets + gameState.remainingBlanks === 0) {
+                        setTimeout(() => {
+                            reloadGun();
+                        }, 1000);
+                        return;
+                    }
+                    
+                    setTimeout(() => {
+                        gun.className = 'gun w-48 h-24 relative';
+                        gameState.currentPlayer = 'enemy';
+                        gameStatus.textContent = '敌人的回合...';
+                        enemyStatus.textContent = '正在瞄准';
+                        playerStatus.textContent = '等待中...';
+                        playerActions.classList.add('hidden');
+                        
+                        setTimeout(() => {
+                            enemyTurn();
+                        }, 1500);
+                    }, 1000);
+                }, 500);
+                
+                return;
+            }
+            
+            playBlankBulletSound();
+            
+            gameState.currentChamberIndex++;
+            gameState.remainingBlanks--;
+            updateBulletInfo();
+            
+            setTimeout(() => {
+                gun.className = 'gun w-48 h-24 relative';
+                
+                // 空包弹时清除菜刀效果
+                let extraText = '';
+                if (gameState.playerDoubleDamage) {
+                    gameState.playerDoubleDamage = false;
+                    extraText = ' 菜刀效果消失了。';
+                }
+                
+                if (target === 'player') {
+                    gameStatus.textContent = '空包弹！继续你的回合！' + extraText;
+                    playerStatus.textContent = '选择目标';
+                    enemyStatus.textContent = '等待中...';
+                    playerActions.classList.remove('hidden');
+                    if (gameState.playerItem && !gameState.playerItemUsed) {
+                        useItemBtn.classList.remove('hidden');
+                    }
+                } else {
+                    gameStatus.textContent = '空包弹！轮到敌人了...' + extraText;
+                    enemyStatus.textContent = '正在瞄准';
+                    playerStatus.textContent = '等待中...';
+                    gameState.currentPlayer = 'enemy';
+                    
+                    setTimeout(() => {
+                        enemyTurn();
+                    }, 1500);
+                }
+                
+                // 检查是否所有子弹都打完了
+                if (gameState.remainingBullets + gameState.remainingBlanks === 0) {
+                    setTimeout(() => {
+                        reloadGun();
+                    }, 1000);
+                }
+            }, 500);
+        }
+
+        function enemyTurn() {
+            if (!gameState.isPlaying || gameState.currentPlayer !== 'enemy') return;
+            
+            if (gameState.enemyItem && !gameState.enemyItemUsed) {
+                if (gameState.enemyItem === 'magnifier') {
+                    gameState.enemyItemUsed = true;
+                    updateItemUI();
+                    const nextBullet = gameState.chambers[gameState.currentChamberIndex];
+                    gameStatus.textContent = '敌人使用了放大镜！';
+                    
+                    setTimeout(() => {
+                        if (nextBullet) {
+                            gameStatus.textContent = '敌人瞄准了你！';
+                            gun.classList.add('gun-point-down');
+                            setTimeout(() => {
+                                enemyFireGun('player');
+                            }, 800);
+                        } else {
+                            gameStatus.textContent = '敌人朝自己开枪...';
+                            gun.classList.add('gun-point-up');
+                            setTimeout(() => {
+                                enemyFireGun('enemy');
+                            }, 800);
+                        }
+                    }, 1000);
+                    return;
+                } else if (gameState.enemyItem === 'knife') {
+                    const realBulletChance = gameState.remainingBullets / (gameState.remainingBullets + gameState.remainingBlanks);
+                    if (realBulletChance > 0.4) {
+                        gameState.enemyItemUsed = true;
+                        gameState.enemyDoubleDamage = true;
+                        updateItemUI();
+                        gameStatus.textContent = '敌人使用了菜刀！下次实弹伤害翻倍！';
+                        setTimeout(() => {
+                            proceedEnemyTurn();
+                        }, 1000);
+                        return;
+                    }
+                } else if (gameState.enemyItem === 'prybar') {
+                    const removedBullet = gameState.chambers[gameState.currentChamberIndex];
+                    gameState.chambers.splice(gameState.currentChamberIndex, 1);
+                    gameState.enemyItemUsed = true;
+                    updateItemUI();
+                    
+                    if (removedBullet) {
+                        gameState.remainingBullets--;
+                        gameStatus.textContent = '敌人使用了撬弹器！撬掉了一颗实弹！';
+                    } else {
+                        gameState.remainingBlanks--;
+                        gameStatus.textContent = '敌人使用了撬弹器！撬掉了一颗空包弹！';
+                    }
+                    
+                    updateBulletInfo();
+                    
+                    // 检查是否所有子弹都被撬完了
+                    if (gameState.remainingBullets + gameState.remainingBlanks === 0) {
+                        setTimeout(() => {
+                            reloadGun();
+                        }, 1500);
+                        return;
+                    }
+                    
+                    setTimeout(() => {
+                        proceedEnemyTurn();
+                    }, 1000);
+                    return;
+                }
+            }
+            
+            proceedEnemyTurn();
+        }
+
+        function proceedEnemyTurn() {
+            const realBulletChance = gameState.remainingBullets / (gameState.remainingBullets + gameState.remainingBlanks);
+            let shootPlayerChance;
+            
+            if (realBulletChance > 0.5) {
+                shootPlayerChance = 0.7;
+            } else if (realBulletChance < 0.2) {
+                shootPlayerChance = 0.3;
+            } else {
+                shootPlayerChance = 0.5;
+            }
+            
+            if (gameState.enemyDoubleDamage) {
+                shootPlayerChance = Math.min(0.9, shootPlayerChance + 0.2);
+            }
+            
+            const willShootPlayer = Math.random() < shootPlayerChance;
+            
+            if (willShootPlayer) {
+                gameStatus.textContent = '敌人瞄准了你！';
+                gun.classList.add('gun-point-down');
+                
+                setTimeout(() => {
+                    enemyFireGun('player');
+                }, 800);
+            } else {
+                gameStatus.textContent = '敌人朝自己开枪...';
+                gun.classList.add('gun-point-up');
+                
+                setTimeout(() => {
+                    enemyFireGun('enemy');
+                }, 800);
+            }
+        }
+
+        function enemyFireGun(target) {
+            const isRealBullet = gameState.chambers[gameState.currentChamberIndex];
+            
+            gun.classList.add('gun-shake');
+            muzzleFlash.classList.add('muzzle-flash');
+            
+            setTimeout(() => {
+                gun.classList.remove('gun-shake');
+                muzzleFlash.classList.remove('muzzle-flash');
+            }, 300);
+            
+            if (isRealBullet) {
+                playRealBulletSound();
+                gun.classList.add('gun-fire');
+
+                gameState.currentChamberIndex++;
+                gameState.remainingBullets--;
+                updateBulletInfo();
+                
+                setTimeout(() => {
+                    if (target === 'player') {
+                        let damage = gameState.enemyDoubleDamage ? 2 : 1;
+                        gameState.playerHealth -= damage;
+                        gameState.enemyDoubleDamage = false;
+
+                        player.classList.add('damage-flash');
+                        setTimeout(() => player.classList.remove('damage-flash'), 500);
+                        updateHealthUI();
+                        
+                        const damageText = damage === 2 ? '双倍伤害！' : '';
+                        gameStatus.textContent = `💥 实弹！${damageText}你受到了伤害！剩余生命：${Math.max(0, gameState.playerHealth)}`;
+                        playerStatus.textContent = '受伤';
+                        
+                        if (gameState.playerHealth <= 0) {
+                            gameState.isPlaying = false;
+                            gameStatus.textContent = '💀 你输了！你的生命值耗尽了！';
+                            playerStatus.textContent = '已死亡';
+                            player.classList.add('death-shake');
+                            player.querySelector('div:first-child').textContent = '💀';
+                            restartBtn.classList.remove('hidden');
+                            return;
+                        }
+                    } else {
+                        let damage = gameState.enemyDoubleDamage ? 2 : 1;
+                        gameState.enemyHealth -= damage;
+                        gameState.enemyDoubleDamage = false;
+
+                        enemy.classList.add('damage-flash');
+                        setTimeout(() => enemy.classList.remove('damage-flash'), 500);
+                        updateHealthUI();
+                        
+                        const damageText = damage === 2 ? '双倍伤害！' : '';
+                        gameStatus.textContent = `💥 实弹！${damageText}敌人受到了伤害！剩余生命：${Math.max(0, gameState.enemyHealth)}`;
+                        enemyStatus.textContent = '受伤';
+                        
+                        if (gameState.enemyHealth <= 0) {
+                            gameState.isPlaying = false;
+                            gameStatus.textContent = '🎉 你赢了！敌人的生命值耗尽了！';
+                            enemyStatus.textContent = '已死亡';
+                            enemy.classList.add('death-shake');
+                            enemy.querySelector('div:first-child').textContent = '💀';
+                            restartBtn.classList.remove('hidden');
+                            return;
+                        }
+                    }
+                    
+                    // 检查是否所有子弹都打完了
+                    if (gameState.remainingBullets + gameState.remainingBlanks === 0) {
+                        setTimeout(() => {
+                            reloadGun();
+                        }, 1000);
+                        return;
+                    }
+                    
+                    setTimeout(() => {
+                        gun.className = 'gun w-48 h-24 relative';
+                        gameState.currentPlayer = 'player';
+                        gameStatus.textContent = '你的回合！选择目标';
+                        playerStatus.textContent = '选择目标';
+                        enemyStatus.textContent = '等待中...';
+                        playerActions.classList.remove('hidden');
+                        if (gameState.playerItem && !gameState.playerItemUsed) {
+                            useItemBtn.classList.remove('hidden');
+                        }
+                    }, 1000);
+                }, 500);
+                
+                return;
+            }
+            
+            playBlankBulletSound();
+            
+            gameState.currentChamberIndex++;
+            gameState.remainingBlanks--;
+            updateBulletInfo();
+            
+            setTimeout(() => {
+                gun.className = 'gun w-48 h-24 relative';
+                
+                // 空包弹时清除菜刀效果
+                let extraText = '';
+                if (gameState.enemyDoubleDamage) {
+                    gameState.enemyDoubleDamage = false;
+                    extraText = ' 敌人的菜刀效果消失了。';
+                }
+                
+                if (target === 'enemy') {
+                    gameStatus.textContent = '空包弹！敌人继续开枪...' + extraText;
+                    enemyStatus.textContent = '正在瞄准';
+                    playerStatus.textContent = '等待中...';
+                    
+                    setTimeout(() => {
+                        enemyTurn();
+                    }, 1500);
+                } else {
+                    gameStatus.textContent = '空包弹！轮到你了！' + extraText;
+                    playerStatus.textContent = '选择目标';
+                    enemyStatus.textContent = '等待中...';
+                    gameState.currentPlayer = 'player';
+                    playerActions.classList.remove('hidden');
+                    if (gameState.playerItem && !gameState.playerItemUsed) {
+                        useItemBtn.classList.remove('hidden');
+                    }
+                }
+                
+                // 检查是否所有子弹都打完了
+                if (gameState.remainingBullets + gameState.remainingBlanks === 0) {
+                    setTimeout(() => {
+                        reloadGun();
+                    }, 1000);
+                }
+            }, 500);
+        }
+
+        function addButtonEvents(button, handler) {
+            button.addEventListener('click', handler);
+            button.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                handler();
+            });
+        }
+
+        addButtonEvents(startBtn, initGame);
+        addButtonEvents(restartBtn, initGame);
+        addButtonEvents(shootEnemyBtn, shootEnemy);
+        addButtonEvents(shootSelfBtn, shootSelf);
+        addButtonEvents(useItemBtn, usePlayerItem);
+    </script>
+</body>
+</html>
