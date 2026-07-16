@@ -38,6 +38,19 @@
             50% { filter: drop-shadow(0 0 25px #ADD8E6); }
             100% { filter: drop-shadow(0 0 10px #ADD8E6); }
         }
+        /* 左上角开发者标签 */
+        .developer-tag {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 10px;
+            color: #ADD8E6;
+            text-shadow: 0 0 8px #ADD8E6, 0 0 15px rgba(173, 216, 230, 0.6);
+            z-index: 9999;
+            opacity: 0;
+            animation: fadeIn 3s ease forwards 0.2s;
+            letter-spacing: 1px;
+        }
         .logo {
             width: 200px;
             height: auto;
@@ -121,6 +134,11 @@
             opacity: 0;
         }
         @media (max-width: 767px) and (orientation: portrait) {
+            .developer-tag {
+                font-size: 8px;
+                top: 10px;
+                left: 10px;
+            }
             .warning-bar {
                 font-size: 10px;
                 padding: 12px 8px;
@@ -146,6 +164,9 @@
     </style>
 </head>
 <body>
+    <!-- 左上角开发者标识 -->
+    <div class="developer-tag">协会长沐沐开发△</div>
+
     <img src="your-logo-image.png" alt="指令标志" class="logo" id="logo">
     <!-- 点击查看容器（初始显示） -->
     <div class="click-to-view" id="clickToView">点击查看</div>
